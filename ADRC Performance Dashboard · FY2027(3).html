@@ -1,0 +1,1572 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ADRC Performance Dashboard · FY2027</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#04132e; --navy2:#0a2348; --ink:#0b1320;
+  --paper:#f6f4ef; --card:#ffffff; --line:#dcd7cc; --grid:#ece8df; --track:#eee9df; --hover:#faf8f3; --tk:#fbf7ec;
+  --accent:#c8a04a; --accent2:#1c6e8c; --teal:#2a8c82; --soft:#7a9aab; --warm:#b9b2a4;
+  --red:#a8432e; --muted:#6b6458; --slate:#3a4756; --serieNavy:#04132e; --onDark:#ffffff;
+  --serif:'Fraunces', Georgia, serif; --sans:'IBM Plex Sans', 'Helvetica Neue', Arial, sans-serif; --mono:'IBM Plex Mono', Menlo, Consolas, monospace;
+  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ink:#e9edf2; --paper:#070f1d; --card:#0d1a2e; --line:#23324a; --grid:#1a2940; --track:#1a2940; --hover:#12223a; --tk:#16213a;
+    --muted:#a39c8f; --slate:#c3ccd8; --serieNavy:#dfe6ef; --soft:#8fb0c2; --warm:#6f6a60;
+  }
+}
+:root[data-theme="dark"]{
+  --ink:#e9edf2; --paper:#070f1d; --card:#0d1a2e; --line:#23324a; --grid:#1a2940; --track:#1a2940; --hover:#12223a; --tk:#16213a;
+  --muted:#a39c8f; --slate:#c3ccd8; --serieNavy:#dfe6ef; --soft:#8fb0c2; --warm:#6f6a60;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{font-family:var(--sans);background:var(--paper);color:var(--ink);-webkit-font-smoothing:antialiased;line-height:1.45}
+.mono{font-family:var(--mono)}
+.wrap{max-width:1280px;margin:0 auto;padding:0 28px}
+button{font:inherit}
+
+header{background:var(--navy);color:#fff;padding:34px 0 30px;position:relative;overflow:hidden}
+header::after{content:"";position:absolute;right:-80px;top:-60px;width:340px;height:340px;background:radial-gradient(circle at center, rgba(200,160,74,.22), transparent 62%);pointer-events:none}
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.32em;text-transform:uppercase;color:var(--accent);margin-bottom:14px}
+header h1{font-family:var(--serif);font-weight:500;font-size:40px;line-height:1.05;letter-spacing:-.5px;max-width:760px}
+header p.sub{margin-top:14px;color:#b9c4d4;font-size:15px;max-width:680px}
+.accent-rule{width:54px;height:3px;background:var(--accent);margin-top:22px}
+
+.controlbar{background:var(--navy2);color:#fff;border-bottom:1px solid rgba(255,255,255,.1);position:sticky;top:0;z-index:20}
+.controlbar .wrap{display:flex;flex-wrap:wrap;align-items:center;gap:14px 22px;padding-top:14px;padding-bottom:14px}
+.fgroup{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.glab{font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:#8ea2bd;font-weight:600}
+.segc{display:flex;gap:5px;flex-wrap:wrap}
+.chip{font-family:var(--mono);font-size:12px;padding:5px 11px;border:1px solid rgba(255,255,255,.22);background:transparent;color:#cdd8e6;cursor:pointer;border-radius:2px;transition:.13s;user-select:none}
+.chip:hover:not(:disabled){border-color:#fff;color:#fff}
+.chip.on{background:var(--accent);color:#1c1304;border-color:var(--accent);font-weight:500}
+.chip:disabled{opacity:.32;cursor:not-allowed;border-style:dashed}
+.ctx{margin-left:auto;font-family:var(--mono);font-size:12px;color:var(--accent);text-align:right;display:flex;gap:14px;align-items:center}
+.mreset{font-size:11px;color:#8ea2bd;cursor:pointer;text-decoration:underline;text-underline-offset:2px;background:none;border:0;font-family:var(--sans)}
+.mreset:hover{color:#fff}
+
+.kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin-top:20px}
+.kpi{background:var(--card);padding:22px 22px 20px}
+.kpi .label{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.kpi .val{font-family:var(--serif);font-size:28px;font-weight:500;margin-top:8px;color:var(--serieNavy);letter-spacing:-.5px}
+.kpi .val.bad{color:var(--red)}
+.kpi .note{font-size:12px;color:var(--slate);margin-top:4px}
+.meter{height:6px;background:var(--track);margin-top:10px;position:relative}
+.meter i{position:absolute;left:0;top:0;bottom:0;background:var(--serieNavy)}
+.meter b{position:absolute;top:-4px;width:2px;height:14px;background:var(--red)}
+
+.tabpane{display:none}.tabpane.on{display:block}
+section{padding:30px 0 6px}
+.secthead{display:flex;align-items:baseline;gap:14px;margin-bottom:18px}
+.secthead .n{font-family:var(--mono);font-size:12px;color:var(--accent);border:1px solid var(--accent);border-radius:2px;padding:2px 7px}
+.secthead h2{font-family:var(--serif);font-weight:500;font-size:23px;color:var(--serieNavy)}
+.grid{display:grid;gap:20px}
+.g2{grid-template-columns:1.6fr 1fr}.g4{grid-template-columns:repeat(4,1fr)}.g2e{grid-template-columns:1fr 1fr}.g3{grid-template-columns:repeat(3,1fr)}
+.card{background:var(--card);border:1px solid var(--line);padding:22px 24px 24px;position:relative;min-width:0}
+.card h3{font-size:13px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--slate);margin-bottom:3px}
+.card .csub{font-size:12px;color:var(--muted);margin-bottom:16px}
+.src{font-size:11px;color:var(--muted);margin-top:12px;font-style:italic}
+.chart{width:100%;position:relative}
+.chart svg{display:block;overflow:visible}
+.legend{display:flex;flex-wrap:wrap;gap:4px 16px;font-size:12px;color:var(--slate);margin:0 0 12px}
+.legend i{display:inline-block;width:10px;height:10px;margin-right:6px;vertical-align:-1px}
+
+.filters{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 14px;align-items:center}
+.filters .glab{color:var(--muted);margin-right:2px}
+.pill{font-family:var(--mono);font-size:12px;padding:6px 13px;border:1px solid var(--line);background:var(--card);color:var(--slate);cursor:pointer;border-radius:2px;transition:.15s;user-select:none}
+.pill:hover{border-color:var(--serieNavy);color:var(--serieNavy)}
+.pill.on{background:var(--navy);color:#fff;border-color:var(--navy)}
+:root[data-theme="dark"] .pill.on{background:var(--accent);color:#1c1304;border-color:var(--accent)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .pill.on{background:var(--accent);color:#1c1304;border-color:var(--accent)}}
+.sep{width:1px;height:20px;background:var(--line);margin:0 6px}
+button:focus-visible,.chip:focus-visible,.pill:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+.tblwrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13px}
+table.wide{min-width:720px}
+th{text-align:left;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);padding:9px 10px;border-bottom:2px solid var(--serieNavy);font-weight:600;vertical-align:bottom}
+th.r,td.r{text-align:right;font-family:var(--mono);white-space:nowrap}
+td{padding:10px;border-bottom:1px solid var(--line);color:var(--ink);vertical-align:top}
+tr:hover td{background:var(--hover)}
+tr.grp td{background:var(--tk);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:600;padding:7px 10px}
+td .dd{display:block;font-size:11px;margin-top:2px}
+.good{color:var(--teal)} .bad{color:var(--red)} .neu{color:var(--muted)}
+.na{color:var(--muted);font-style:italic;font-family:var(--sans);font-size:12px}
+.ut{display:inline-flex;align-items:center;gap:8px}
+.ubar{position:relative;width:70px;height:6px;background:var(--track)}
+.ubar span{position:absolute;left:0;top:0;bottom:0;background:var(--serieNavy)}
+.ubar em{position:absolute;top:-4px;width:2px;height:14px;background:var(--red)}
+.dim{opacity:.35}
+.spark{display:block;margin-left:auto}
+
+.takeaway{background:var(--tk);border-left:3px solid var(--accent);padding:13px 16px;font-size:13px;color:var(--slate);margin-top:16px}
+.takeaway b{color:var(--serieNavy)}
+
+.find{background:var(--card);border:1px solid var(--line);padding:20px 22px;border-top:3px solid var(--serieNavy)}
+.find.bad{border-top-color:var(--red)}.find.good{border-top-color:var(--teal)}
+.find .big{font-family:var(--serif);font-size:32px;font-weight:500;color:var(--serieNavy);letter-spacing:-.5px;line-height:1}
+.find.bad .big{color:var(--red)}
+.find h4{font-size:13px;font-weight:600;color:var(--ink);margin:10px 0 6px;line-height:1.35}
+.find p{font-size:12.5px;color:var(--slate)}
+
+.callout{display:flex;gap:1px;flex-wrap:wrap;background:var(--line);border:1px solid var(--line);margin-top:16px}
+.callout div{flex:1 1 120px;background:var(--card);padding:12px 14px;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.callout b{display:block;font-family:var(--serif);font-size:22px;font-weight:500;color:var(--serieNavy);letter-spacing:-.3px;text-transform:none;margin-bottom:2px}
+
+.tiles{display:grid;grid-template-columns:repeat(6,1fr);gap:1px;background:var(--line);border:1px solid var(--line)}
+.tile{background:var(--card);padding:16px 16px 14px;min-width:0}
+.tile .t{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:600;min-height:30px}
+.tile .n{font-family:var(--serif);font-size:28px;font-weight:500;color:var(--serieNavy);letter-spacing:-.5px;line-height:1.1;margin-top:4px}
+.tile .d{font-size:12px;margin:3px 0 10px}
+
+.sub-h{font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--slate);margin:0 0 8px}
+.dq{list-style:none;counter-reset:d}
+.dq li{counter-increment:d;position:relative;padding:12px 10px 12px 46px;border-bottom:1px solid var(--line);font-size:13px;color:var(--slate)}
+.dq li::before{content:counter(d,decimal-leading-zero);position:absolute;left:10px;top:12px;font-family:var(--mono);font-size:12px;color:var(--accent)}
+.dq b{color:var(--ink)}
+
+td.sel,th.sel{background:var(--tk)}
+td.pend,th.pend{color:var(--muted);opacity:.55}
+.qgap{margin-left:8px}
+.ytd{font-weight:600}
+@media(max-width:560px){.g4{grid-template-columns:1fr}}
+.flagtag{font-family:var(--mono);font-size:11px;padding:2px 7px;border-radius:2px;white-space:nowrap;display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);color:var(--ink)}
+.flagtag i{width:8px;height:8px;display:inline-block}
+.st{display:inline-flex;align-items:center;gap:8px;white-space:nowrap}
+select{font-family:var(--mono);font-size:12px;padding:6px 10px;border:1px solid var(--line);background:var(--card);color:var(--slate);border-radius:2px;max-width:100%}
+select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.hv{display:inline-block;vertical-align:middle}
+.cm td.r,.cm th.r{text-align:center}
+.vsep{width:1px;height:22px;background:rgba(255,255,255,.18)}
+.narr{font-size:14px;line-height:1.65;color:var(--ink);max-width:95ch}
+.narr p{margin:0 0 12px}
+.narr h4{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin:18px 0 8px;font-weight:500}
+.narr h4:first-child{margin-top:0}
+.calc{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line)}
+.calc label{background:var(--card);padding:14px 16px;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600;display:block}
+.calc input{display:block;width:100%;margin-top:8px;font-family:var(--mono);font-size:16px;padding:6px 8px;border:1px solid var(--line);background:var(--paper);color:var(--ink);border-radius:2px}
+.calc input:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.calc small{display:block;font-size:11px;letter-spacing:0;text-transform:none;font-weight:400;margin-top:6px;color:var(--muted)}
+@media(max-width:800px){.calc{grid-template-columns:1fr 1fr}}
+footer{margin:40px 0 24px;padding-top:18px;border-top:1px solid var(--line);font-size:11.5px;color:var(--muted);display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
+#tip{position:fixed;pointer-events:none;background:var(--navy);color:#fff;border-left:3px solid var(--accent);font-size:12px;padding:7px 10px;max-width:260px;line-height:1.4;opacity:0;transition:opacity .12s;z-index:40;font-family:var(--sans)}
+
+@media(max-width:1000px){.kpis{grid-template-columns:repeat(2,1fr)}.g2,.g2e,.g3{grid-template-columns:1fr}.g4{grid-template-columns:repeat(2,1fr)}.tiles{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:900px){header h1{font-size:30px}.controlbar{position:static}.ctx{margin-left:0}}
+@media(max-width:560px){.wrap{padding:0 16px}.tiles{grid-template-columns:repeat(2,1fr)}.kpi{padding:16px}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <div class="eyebrow">Atlanta Regional Commission &nbsp;&middot;&nbsp; Area Agency on Aging &nbsp;&middot;&nbsp; Aging &amp; Independence Services</div>
+    <h1>ADRC Performance Dashboard, FY2027</h1>
+    <p class="sub">Aging &amp; Disability Resource Connection contact-center operations: call volume, callback management, team productivity, intake channels and specialized programs. Fiscal year July 2026 – June 2027.</p>
+    <div class="accent-rule"></div>
+  </div>
+</header>
+
+<div class="controlbar">
+  <div class="wrap">
+    <div class="fgroup">
+      <span class="glab">View</span>
+      <div class="segc" id="tabChips" role="tablist" aria-label="Dashboard views">
+        <button class="chip on" role="tab" aria-selected="true" data-tab="summary">Summary</button>
+        <button class="chip" role="tab" aria-selected="false" data-tab="calls">Calls &amp; callbacks</button>
+        <button class="chip" role="tab" aria-selected="false" data-tab="teams">Teams &amp; staff</button>
+        <button class="chip" role="tab" aria-selected="false" data-tab="profile">Staff profile</button>
+        <button class="chip" role="tab" aria-selected="false" data-tab="intake">Intake &amp; programs</button>
+        <button class="chip" role="tab" aria-selected="false" data-tab="bri">BRI program</button>
+        <button class="chip" role="tab" aria-selected="false" data-tab="capacity">Capacity &amp; narrative</button>
+        <button class="chip" role="tab" aria-selected="false" data-tab="watch">Watch list</button>
+        <button class="chip" role="tab" aria-selected="false" data-tab="notes">Data quality</button>
+      </div>
+    </div>
+    <div class="fgroup">
+      <span class="glab">Month</span>
+      <div class="segc" id="months" role="group" aria-label="Reporting month"></div>
+      <span class="vsep" aria-hidden="true"></span>
+      <span class="glab">Period</span>
+      <div class="segc" id="periods" role="group" aria-label="Reporting period"></div>
+    </div>
+    <div class="ctx"><span id="ctxLabel"></span><button class="mreset" id="themeBtn" type="button">switch theme</button></div>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="kpis" id="kpis"></div>
+</div>
+
+<div class="wrap">
+
+<!-- ================= SUMMARY ================= -->
+<div class="tabpane on" id="tab-summary">
+  <section>
+    <div class="secthead"><span class="n">01</span><h2 id="findH">Key findings for the month</h2></div>
+    <div class="grid g4" id="findings"></div>
+  </section>
+  <section>
+    <div class="secthead"><span class="n">02</span><h2>Call volume &amp; key indicators</h2></div>
+    <div class="grid g2">
+      <div class="card" id="ex1">
+        <h3>Reported Calls Serviced by Month</h3>
+        <div class="csub">Total calls serviced as reported, FY2027. Select a bar to change the reporting month.</div>
+        <div class="chart" data-c></div>
+        <div class="callout" data-o></div>
+        <div class="takeaway"><b data-t></b></div>
+        <p class="src">Excludes BRI, resource specialist and transfer queues; dashed outlines mark months not yet reported. Source: ADRC Dashboard FY2027 workbook, monthly tabs.</p>
+      </div>
+      <div class="card">
+        <h3>Key Indicators</h3>
+        <div class="csub">Selected period, change against the prior period and FY2027 monthly trend.</div>
+        <div class="tblwrap"><table id="kpiTable"></table></div>
+        <p class="src">Lower is better for callback backlog, wait and handle time. Source: ADRC Dashboard FY2027 workbook.</p>
+      </div>
+    </div>
+  </section>
+  <section>
+    <div class="secthead"><span class="n">03</span><h2>FY2027 monthly performance</h2></div>
+    <div class="card" id="exMT">
+      <h3>Month-by-Month Performance Table</h3>
+      <div class="csub">Every reported month of FY2027 with a year-to-date column through the selected month. Shaded column is the selected month.</div>
+      <div class="tblwrap"><table class="wide" data-c></table></div>
+      <div class="takeaway"><b data-t></b></div>
+      <p class="src">YTD sums volumes; rates, handle times and averages are averaged across months; backlog shows the latest month; longest wait shows the maximum. Source: ADRC Dashboard FY2027 workbook.</p>
+    </div>
+  </section>
+</div>
+
+<!-- ================= CALLS ================= -->
+<div class="tabpane" id="tab-calls">
+  <section>
+    <div class="secthead"><span class="n">04</span><h2>Callback pipeline &amp; reported volume</h2></div>
+    <div class="grid g2e">
+      <div class="card" id="ex2">
+        <h3>Callback Pipeline</h3>
+        <div class="csub">Number of callbacks at each stage, selected month (% of callbacks selected by callers).</div>
+        <div class="chart" data-c></div>
+        <div class="callout" data-o></div>
+        <div class="takeaway"><b data-t></b></div>
+        <p class="src">Not serviced reflects ring-no-answer, voicemail, carrier failure and cancellation outcomes. Source: ADRC Dashboard FY2027 workbook.</p>
+      </div>
+      <div class="card" id="ex3">
+        <h3>Bridge to Reported Calls Serviced</h3>
+        <div class="csub">From all serviced interactions (callbacks, voicemails, outbound) to the reported figure.</div>
+        <div class="chart" data-c></div>
+        <div class="takeaway"><b data-t></b></div>
+        <p class="src">Source: ADRC Dashboard FY2027 workbook, monthly summary.</p>
+      </div>
+    </div>
+  </section>
+  <section>
+    <div class="secthead"><span class="n">05</span><h2>Callback &amp; handle-time trends</h2></div>
+    <div class="grid g2e">
+      <div class="card" id="exCT">
+        <h3>Callback Conversion Rates</h3>
+        <div class="csub">Share of callbacks moving through each stage, by month, FY2027 (%).</div>
+        <div class="legend" data-l></div>
+        <div class="chart" data-c></div>
+        <div class="takeaway"><b data-t></b></div>
+        <p class="src">Scheduling rate = scheduled ÷ selected; acceptance rate = accepted ÷ scheduled; service rate = serviced ÷ scheduled. Source: ADRC Dashboard FY2027 workbook.</p>
+      </div>
+      <div class="card" id="exHT">
+        <h3>Handle Time Trend</h3>
+        <div class="csub">Average handle time by contact type, minutes, FY2027.</div>
+        <div class="legend" data-l></div>
+        <div class="chart" data-c></div>
+        <div class="takeaway"><b data-t></b></div>
+        <p class="src">Handle time = talk + wrap. Source: ADRC Dashboard FY2027 workbook; contact-center system averages.</p>
+      </div>
+    </div>
+  </section>
+  <section>
+    <div class="secthead"><span class="n">06</span><h2>Handle time &amp; callback wait</h2></div>
+    <div class="grid g2e">
+      <div class="card" id="ex5">
+        <h3>Average Handle Time by Contact Type</h3>
+        <div class="csub">Minutes per contact, talk and wrap, ADRC-wide.</div>
+        <div class="legend"><span><i style="background:var(--serieNavy)"></i>Talk</span><span><i style="background:var(--accent)"></i>Wrap</span></div>
+        <div class="chart" data-c></div>
+        <div class="takeaway"><b data-t></b></div>
+        <p class="src">Source: ADRC Dashboard FY2027 workbook; contact-center system averages.</p>
+      </div>
+      <div class="card" id="ex6">
+        <h3>Callback Wait Time</h3>
+        <div class="csub">Days from callback request to service, FY2027.</div>
+        <div class="legend"><span><i style="background:var(--accent)"></i>Average wait</span><span><i style="background:var(--serieNavy)"></i>Longest wait</span></div>
+        <div class="chart" data-c></div>
+        <div class="takeaway"><b data-t></b></div>
+        <p class="src">Standard of promptness (SOP) reported at <span data-sop></span>. Source: ADRC Dashboard FY2027 workbook.</p>
+      </div>
+    </div>
+  </section>
+  <section>
+    <div class="secthead"><span class="n">07</span><h2>Call mix &amp; agent time</h2></div>
+    <div class="grid g2e">
+      <div class="card" id="ex7">
+        <h3>Call Disposition Mix</h3>
+        <div class="csub">Calls by disposition category, selected month.</div>
+        <div class="filters" id="dispSeg"></div>
+        <div class="chart" data-c></div>
+        <div class="takeaway"><b data-t></b> <span data-x></span></div>
+        <p class="src">Calls carrying multiple dispositions are counted once in each category. Source: ADRC Dashboard FY2027 workbook, disposition report.</p>
+      </div>
+      <div class="card" id="ex8">
+        <h3>Agent Status Time</h3>
+        <div class="csub">Share of total recorded agent status time, by month.</div>
+        <div class="legend" data-l></div>
+        <div class="chart" data-c></div>
+        <div class="takeaway"><b data-t></b></div>
+        <p class="src">Call work includes additional call work, outbound calls, correspondence and resource-update outbound time. Source: not-ready reason report.</p>
+      </div>
+    </div>
+  </section>
+  <section>
+    <div class="secthead"><span class="n">08</span><h2>Disposition trend</h2></div>
+    <div class="card" id="exDT">
+      <h3>Disposition Mix by Month</h3>
+      <div class="csub">Calls by disposition category and share of tagged calls for each reported month; change in share for the selected month.</div>
+      <div class="tblwrap"><table class="wide" data-c></table></div>
+      <div class="takeaway"><b data-t></b></div>
+      <p class="src">Calls carrying multiple dispositions are counted once in each category; August “not dispositioned” reflects a set-up error since corrected. Source: disposition report.</p>
+    </div>
+  </section>
+</div>
+
+<!-- ================= TEAMS ================= -->
+<div class="tabpane" id="tab-teams">
+  <section>
+    <div class="secthead"><span class="n">09</span><h2>Team performance scorecard</h2></div>
+    <div class="card" id="ex4">
+      <h3>Team Scorecard</h3>
+      <div class="csub">Selected month; change shown against the prior month. Utilization target is 80%.</div>
+      <div class="filters" id="teamSeg"></div>
+      <div class="tblwrap"><table class="wide" data-c></table></div>
+      <div class="takeaway"><b data-t></b></div>
+      <p class="src">Staff counts are FTE; July and August I&amp;R figures exclude two staff members, per the workbook’s FTE note. Source: ADRC Dashboard FY2027 workbook; IR, EDWP and HCBS staff-sharing tabs.</p>
+    </div>
+  </section>
+  <section>
+    <div class="secthead"><span class="n">10</span><h2>Team trends</h2></div>
+    <div class="grid g2e">
+      <div class="card" id="exUT">
+        <h3>Utilization by Team</h3>
+        <div class="csub">Team utilization by month against the 80% target, FY2027 (%).</div>
+        <div class="legend" data-l></div>
+        <div class="chart" data-c></div>
+        <div class="takeaway"><b data-t></b></div>
+        <p class="src">Red dashed rule marks the 80% target. Source: IR, EDWP and HCBS staff-sharing tabs.</p>
+      </div>
+      <div class="card" id="exHA">
+        <h3>HCBS Assessment Volume</h3>
+        <div class="csub">Triages and HCBS DON-Rs completed across all teams, by month, FY2027.</div>
+        <div class="legend"><span><i style="background:var(--serieNavy)"></i>Triages</span><span><i style="background:var(--accent)"></i>HCBS DON-Rs</span></div>
+        <div class="chart" data-c></div>
+        <div class="callout" data-o></div>
+        <div class="takeaway"><b data-t></b></div>
+        <p class="src">CCSP DON-Rs are listed in the callout; they are reported by staff in the staff-by-team table. Source: ADRC Dashboard FY2027 workbook.</p>
+      </div>
+    </div>
+    <div class="grid g2e" style="margin-top:20px">
+      <div class="card" id="exTA">
+        <h3>Team Handle Time</h3>
+        <div class="csub">Average team handle time in minutes, by team and month, FY2027.</div>
+        <div class="legend" data-l></div>
+        <div class="chart" data-c></div>
+        <div class="takeaway"><b data-t></b></div>
+        <p class="src">New data point: “Average Team Handle Time” row on each monthly tab. Source: ADRC Dashboard FY2027 workbook (updated 10/06/26).</p>
+      </div>
+      <div class="card" id="exCH">
+        <h3>Calls per Hour by Team</h3>
+        <div class="csub">Average calls handled per staffed hour, by team and month, FY2027.</div>
+        <div class="legend" data-l></div>
+        <div class="chart" data-c></div>
+        <div class="takeaway"><b data-t></b></div>
+        <p class="src">Source: ADRC Dashboard FY2027 workbook; team values on each monthly tab.</p>
+      </div>
+    </div>
+  </section>
+  <section>
+    <div class="secthead"><span class="n">11</span><h2>Staff productivity</h2></div>
+    <div class="card" id="ex10">
+      <h3 data-u></h3>
+      <div class="csub" data-k></div>
+      <div class="filters" id="staffTeam"></div>
+      <div class="filters" id="staffMetric"></div>
+      <div class="chart" data-c></div>
+      <div class="takeaway"><b data-t></b></div>
+      <p class="src">Dashed rule marks the average of the staff shown; staff with no recorded interactions appear at zero. Source: staff-by-team table.</p>
+    </div>
+  </section>
+  <section>
+    <div class="secthead"><span class="n">12</span><h2>Staff workload &amp; month-over-month change</h2></div>
+    <div class="grid g2e">
+      <div class="card" id="exSC">
+        <h3>Volume vs. Handle Time</h3>
+        <div class="csub">Each dot is a staff member: interactions serviced (x) against average handle time in minutes (y), selected month. Uses the team filter above.</div>
+        <div class="chart" data-c></div>
+        <div class="takeaway"><b data-t></b></div>
+        <p class="src">Dashed rules mark the averages of the staff shown; hover a dot for detail. Staff with no interactions are excluded. Source: staff-by-team table.</p>
+      </div>
+      <div class="card" id="exST">
+        <h3>Interactions by Staff Member, by Month</h3>
+        <div class="csub">Monthly interactions serviced for each reported month, change for the selected month, and trend. Uses the team filter above.</div>
+        <div class="tblwrap" style="max-height:560px;overflow:auto"><table data-c></table></div>
+        <div class="takeaway"><b data-t></b></div>
+        <p class="src">Sorted by the selected month. Source: staff-by-team table.</p>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- ================= PROFILE ================= -->
+<div class="tabpane" id="tab-profile">
+  <section>
+    <div class="secthead"><span class="n">13</span><h2>Staff profile</h2></div>
+    <div class="card">
+      <h3>Select a Staff Member</h3>
+      <div class="csub">Individual performance for the selected period, compared with the staff member's team. Team average excludes staff with no recorded interactions.</div>
+      <div class="filters"><span class="glab">Staff</span><select id="staffSel" aria-label="Staff member"></select><span class="glab" style="margin-left:10px">Team</span><span id="staffTeamLbl" class="flagtag"></span></div>
+      <div class="kpis" id="pKpis" style="margin-top:6px"></div>
+    </div>
+  </section>
+  <section>
+    <div class="secthead"><span class="n">14</span><h2>Trend against team average</h2></div>
+    <div class="grid g2e">
+      <div class="card" id="exPV">
+        <h3>Interactions Serviced</h3>
+        <div class="csub">Monthly interactions, staff member vs. team average, FY2027.</div>
+        <div class="legend" data-l></div>
+        <div class="chart" data-c></div>
+        <div class="takeaway"><b data-t></b></div>
+        <p class="src">Source: staff-by-team table.</p>
+      </div>
+      <div class="card" id="exPA">
+        <h3>Average Handle Time</h3>
+        <div class="csub">Monthly average handle time in minutes, staff member vs. team average, FY2027.</div>
+        <div class="legend" data-l></div>
+        <div class="chart" data-c></div>
+        <div class="takeaway"><b data-t></b></div>
+        <p class="src">Team average is weighted by interactions. Source: staff-by-team table.</p>
+      </div>
+    </div>
+  </section>
+  <section>
+    <div class="secthead"><span class="n">15</span><h2>Monthly detail</h2></div>
+    <div class="card" id="exPT">
+      <h3>Staff Member by Month</h3>
+      <div class="csub">Reported months with the team comparison for each.</div>
+      <div class="tblwrap"><table class="wide" data-c></table></div>
+      <p class="src">Variance compares the staff member's interactions with the team average for the same month. Source: staff-by-team table.</p>
+    </div>
+  </section>
+</div>
+
+<!-- ================= INTAKE ================= -->
+<div class="tabpane" id="tab-intake">
+  <section>
+    <div class="secthead"><span class="n">16</span><h2>Intake &amp; referral channels</h2></div>
+    <div class="card" id="ex9">
+      <h3>Intake and Referral Volume</h3>
+      <div class="csub">Selected month, with FY2027 monthly trend (gold bar = selected month).</div>
+      <div class="tiles" data-c></div>
+      <div class="takeaway"><b data-t></b></div>
+      <p class="src">Source: ADRC Dashboard FY2027 workbook, ADRC intake section.</p>
+    </div>
+  </section>
+  <section>
+    <div class="secthead"><span class="n">17</span><h2>Referral &amp; resource trends</h2></div>
+    <div class="grid g2e">
+      <div class="card" id="exRF">
+        <h3>Outbound Referrals by Partner</h3>
+        <div class="csub">APS, UniteUs and MAC referrals by month, FY2027.</div>
+        <div class="legend" data-l></div>
+        <div class="chart" data-c></div>
+        <div class="takeaway"><b data-t></b></div>
+        <p class="src">Source: ADRC Dashboard FY2027 workbook, ADRC intake section.</p>
+      </div>
+      <div class="card" id="exRS">
+        <h3>Resource Specialist Output</h3>
+        <div class="csub">P28 calls processed and ePRO resource records updated, by month, FY2027.</div>
+        <div class="legend" data-l></div>
+        <div class="chart" data-c></div>
+        <div class="takeaway"><b data-t></b></div>
+        <p class="src">Source: resource specialist table.</p>
+      </div>
+    </div>
+    <div class="grid g2e" style="margin-top:20px">
+      <div class="card" id="exUU">
+        <h3>UniteUs Referral Processing</h3>
+        <div class="csub">UniteUs referrals by month: processed by Special Projects staff vs. not attributed to a staff member.</div>
+        <div class="legend"><span><i style="background:var(--serieNavy)"></i>Derek</span><span><i style="background:var(--accent2)"></i>Shalynda</span><span><i style="background:var(--warm)"></i>Not attributed</span></div>
+        <div class="chart" data-c></div>
+        <div class="takeaway"><b data-t></b></div>
+        <p class="src">New data point: the Special Projects table reports UniteUs referrals per staff member from August; July was not tracked by staff. Source: ADRC Dashboard FY2027 workbook (updated 10/06/26).</p>
+      </div>
+      <div class="card" id="exEC">
+        <h3>ePRO Updating Compliance</h3>
+        <div class="csub">Share of ePRO resource records that are current, by month, FY2027.</div>
+        <div class="chart" data-c></div>
+        <div class="callout" data-o></div>
+        <div class="takeaway"><b data-t></b></div>
+        <p class="src">New data point: “Updating Compliance” (records current ÷ total records) in the resource specialist table. Percentages are computed from the record counts; the workbook shows them rounded (90%, 94%, 95%). Source: ADRC Dashboard FY2027 workbook (updated 10/06/26).</p>
+      </div>
+    </div>
+  </section>
+  <section>
+    <div class="secthead"><span class="n">18</span><h2>Resource specialists &amp; transitions</h2></div>
+    <div class="card" id="ex11">
+      <h3>Specialized Program Activity</h3>
+      <div class="csub">Resource specialist and transitions activity, selected month.</div>
+      <div class="grid g2e" data-c></div>
+      <div class="takeaway"><b data-t></b></div>
+      <p class="src">One specialist adds new ePRO records until cross-training concludes; that specialist’s updates come from Provider Update queue auto-returns rather than update calls.</p>
+    </div>
+  </section>
+</div>
+
+<!-- ================= BRI ================= -->
+<div class="tabpane" id="tab-bri">
+  <section>
+    <div class="secthead"><span class="n">19</span><h2>BRI program at a glance</h2></div>
+    <div class="kpis" id="briK" style="margin-top:0"></div>
+  </section>
+  <section>
+    <div class="secthead"><span class="n">20</span><h2>Caseload flow</h2></div>
+    <div class="grid g2e">
+      <div class="card" id="exBF">
+        <h3>New and Discharged Cases</h3>
+        <div class="csub">BRI cases opened and discharged (D/C) by month, FY2027; label shows net change.</div>
+        <div class="legend"><span><i style="background:var(--teal)"></i>New cases</span><span><i style="background:var(--red)"></i>Discharged cases</span></div>
+        <div class="chart" data-c></div>
+        <div class="takeaway"><b data-t></b></div>
+        <p class="src">Source: BRI New Cases and BRI D/C Cases, monthly tabs (updated 10/06/26).</p>
+      </div>
+      <div class="card" id="exBS">
+        <h3>Total Clients Served</h3>
+        <div class="csub">BRI clients served each month, FY2027.</div>
+        <div class="chart" data-c></div>
+        <div class="takeaway"><b data-t></b></div>
+        <p class="src">Quarter and FYTD views show the last month of the period, since monthly client counts overlap. Source: BRI Total Clients Served, monthly tabs.</p>
+      </div>
+    </div>
+  </section>
+  <section>
+    <div class="secthead"><span class="n">21</span><h2>BRI staff activity</h2></div>
+    <div class="grid g2e">
+      <div class="card" id="exBE">
+        <h3>Enrollments by Staff Member</h3>
+        <div class="csub">BRI enrollments by staff member and month, FY2027.</div>
+        <div class="legend" data-l></div>
+        <div class="chart" data-c></div>
+        <div class="takeaway"><b data-t></b></div>
+        <p class="src">New data point: “# of Enrollments” column for BRI staff. Source: staff-by-team table (updated 10/06/26).</p>
+      </div>
+      <div class="card" id="exBT">
+        <h3>BRI Staff Detail</h3>
+        <div class="csub">Interactions, handle time and enrollments for the selected period.</div>
+        <div class="tblwrap"><table data-c></table></div>
+        <div class="takeaway"><b data-t></b></div>
+        <p class="src">“Per 100 interactions” = enrollments ÷ interactions × 100. Source: staff-by-team table.</p>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- ================= CAPACITY ================= -->
+<div class="tabpane" id="tab-capacity">
+  <section>
+    <div class="secthead"><span class="n">22</span><h2>Monthly narrative</h2></div>
+    <div class="card" id="exNR">
+      <h3>Trends Narrative from the Workbook</h3>
+      <div class="csub">The written trend summary entered on each monthly tab, for the months in the selected period.</div>
+      <div class="narr" data-c></div>
+      <p class="src">New data point: “Trends” narrative at the foot of each monthly tab, reproduced as entered. Source: ADRC Dashboard FY2027 workbook (updated 10/06/26).</p>
+    </div>
+  </section>
+  <section>
+    <div class="secthead"><span class="n">23</span><h2>Capacity evidence</h2></div>
+    <div class="card" id="exCE">
+      <h3>Capacity Indicators by Month</h3>
+      <div class="csub">The measures the narrative relies on, side by side, with status against the standard or prior month.</div>
+      <div class="tblwrap"><table class="wide" data-c></table></div>
+      <div class="takeaway"><b data-t></b></div>
+      <p class="src">Non-call workload adds web intakes, information emails, APS, UniteUs and MAC referrals, and walk-ins; as the narrative notes, these categories may overlap. Source: ADRC Dashboard FY2027 workbook.</p>
+    </div>
+    <div class="grid g2e" style="margin-top:20px">
+      <div class="card" id="exWC">
+        <h3>Workload Composition</h3>
+        <div class="csub">Calls serviced and non-call work items by month, FY2027.</div>
+        <div class="legend" data-l></div>
+        <div class="chart" data-c></div>
+        <div class="takeaway"><b data-t></b></div>
+        <p class="src">Categories may overlap. Source: ADRC Dashboard FY2027 workbook.</p>
+      </div>
+      <div class="card" id="exBL">
+        <h3>Callbacks Serviced vs. Backlog</h3>
+        <div class="csub">Callbacks serviced each month against callbacks still in the list at month end.</div>
+        <div class="legend"><span><i style="background:var(--serieNavy)"></i>Callbacks serviced</span><span><i style="background:var(--red)"></i>Still in callback list</span></div>
+        <div class="chart" data-c></div>
+        <div class="takeaway"><b data-t></b></div>
+        <p class="src">Source: callback summary, monthly tabs.</p>
+      </div>
+    </div>
+  </section>
+  <section>
+    <div class="secthead"><span class="n">24</span><h2>Capacity gap estimate</h2></div>
+    <div class="card" id="exCG">
+      <h3>Staffing Needed to Clear the Callback Backlog</h3>
+      <div class="csub">Illustrative estimate. Adjust the assumptions; defaults come from the selected period.</div>
+      <div class="calc" id="calcIn"></div>
+      <div class="callout" data-o></div>
+      <div class="chart" data-c style="margin-top:16px"></div>
+      <div class="takeaway"><b data-t></b></div>
+      <p class="src">Additional FTE = backlog ÷ (calls one FTE handles per day × working days to clear). This sizes temporary capacity for the existing backlog only; it does not model new demand, absences or skill mix, and is not an adopted staffing standard.</p>
+    </div>
+  </section>
+</div>
+
+<!-- ================= WATCH ================= -->
+<div class="tabpane" id="tab-watch">
+  <section>
+    <div class="secthead"><span class="n">25</span><h2>Watch list summary</h2></div>
+    <div class="grid g3" id="wFind"></div>
+  </section>
+  <section>
+    <div class="secthead"><span class="n">26</span><h2>Performance flags</h2></div>
+    <div class="card" id="exWF">
+      <h3>Operational Flags for the Period</h3>
+      <div class="csub">Rules-based flags on the selected period against standards and the prior period. Alerts need action; watch items need monitoring; improvements are favorable movements.</div>
+      <div class="filters" id="wSeg"></div>
+      <div class="tblwrap"><table class="wide" data-c></table></div>
+      <div class="takeaway"><b data-t></b></div>
+      <p class="src">Thresholds are dashboard defaults set for monitoring, not adopted ARC or DAS standards, except the 80% utilization target and the SOP days reported in the workbook.</p>
+    </div>
+  </section>
+  <section>
+    <div class="secthead"><span class="n">27</span><h2>Staff variance</h2></div>
+    <div class="card" id="exWS">
+      <h3>Staff Outside Team Norms</h3>
+      <div class="csub">Staff whose volume or handle time differs materially from their team, selected period.</div>
+      <div class="tblwrap"><table class="wide" data-c></table></div>
+      <div class="takeaway"><b data-t></b></div>
+      <p class="src">Rules: volume below 60% of team average; handle time 25% or more above team average; no recorded interactions. Variance may reflect leave, part-time schedules, training or special assignments; review with supervisors before drawing conclusions.</p>
+    </div>
+  </section>
+</div>
+
+<!-- ================= NOTES ================= -->
+<div class="tabpane" id="tab-notes">
+  <section>
+    <div class="secthead"><span class="n">28</span><h2>Data completeness by month</h2></div>
+    <div class="card" id="exDQ">
+      <h3>Workbook Completeness Tracker</h3>
+      <div class="csub">Whether each data block has been entered for each FY2027 month. Use this to see what still needs to be filled in before monthly reporting.</div>
+      <div class="legend"><span class="st"><span class="hv" data-h="1"></span>Complete</span><span class="st"><span class="hv" data-h=".5"></span>Partial or flagged</span><span class="st"><span class="hv" data-h="0"></span>Not entered</span></div>
+      <div class="tblwrap"><table class="wide cm" data-c></table></div>
+      <div class="takeaway"><b data-t></b></div>
+      <p class="src">Partial: some fields blank, zero-interaction staff, Ready time missing, or not-dispositioned calls above 10%. Source: ADRC Dashboard FY2027 workbook.</p>
+    </div>
+  </section>
+  <section>
+    <div class="secthead"><span class="n">29</span><h2>Data notes</h2></div>
+    <div class="card">
+      <ol class="dq">
+        <li><b>Reporting coverage.</b> FY2027 runs July 2026 through June 2027. July–September 2026 are reported; October 2026 onward have not been entered in the workbook.</li>
+        <li><b>Handle-time entry.</b> Handle times entered as hours:minutes in parts of the workbook were read as minutes:seconds, consistent with the system-calculated totals.</li>
+        <li><b>July web intakes.</b> 2,098 on the monthly tab versus 2,077 on the staff-sharing tabs; this dashboard uses the monthly tab.</li>
+        <li><b>Updated workbook (10/06/26).</b> Core July–September figures are unchanged. New data points added: team-level handle time, BRI enrollments and caseload (new, discharged, clients served), UniteUs referrals by Special Projects staff, CCSP DON-Rs and rescreens by staff, ePRO updating compliance, monthly trend narratives, and September ePRO and transitions counts.</li>
+        <li><b>August dispositions.</b> Elevated “not dispositioned” calls reflect a disposition set-up error, since corrected.</li>
+        <li><b>September status time.</b> The status-time report omits Ready time; September ePRO record counts and transitions activity are now entered.</li>
+        <li><b>Team averages.</b> Recalculated from team values; the workbook’s August team-average calls per hour (62) appears to be an entry error.</li>
+      </ol>
+    </div>
+  </section>
+</div>
+
+<footer>
+  <span>Atlanta Regional Commission · Aging &amp; Independence Services · ADRC</span>
+  <span>Source: ADRC Dashboard FY2027 workbook</span>
+</footer>
+</div>
+<div id="tip" role="tooltip"></div>
+
+<script>
+const D = [{"month":"July 2026","staff":[8.8,8.6,4.8],"sopCal":[12,12,12],"sopBus":[9,9,9],"avgWait":[11.15,11.15,11.15],"longWait":[12.95,12.95,12.95],"callsServiced":5402,"callsPerDay":[11,9,10],"callsPerHour":[1.23,1.82,1.42],"teamCalls8h":[118,146,57],"util":[0.8555,0.8833,0.8443],"survey":0.97,"hcbsDonr":[3,6,86],"triage":[6,12,228],"mde":[0.981,0.967,1],"teamAht":[19.67,19.95,18.45],"narrative":["July results demonstrate that ADRC staff maintained strong service delivery while operating above the established utilization target. Staff utilization averaged 86.1%, exceeding the 80% target, with all three teams above target. The team serviced 5,402 reportable calls, averaging 10 calls per staff member per day, while achieving 98.27% MDE quality and 97% post-call satisfaction. These results show that staff were actively using available capacity and maintaining quality and consumer satisfaction under substantial workload pressure.","Despite this performance, average callback wait time was approximately 11.2 calendar days, the longest wait approached 13 calendar days, and 512 callbacks remained unserviced in the callback list. Telephone activity represented only part of the workload: July also included 2,098 web intakes, 170 information emails, 81 APS referrals, 173 Unite Us referrals, and 5 walk-ins, alongside screening, triage, documentation, and program responsibilities. These categories may overlap, but they illustrate the range of demands competing for staff time. The combination of above-target utilization, strong service outcomes, and persistent delays indicates a capacity constraint and supports a request for additional staffing capacity and targeted workload redistribution."],"aht":{"callback":20.18,"cbTalk":10.07,"cbWrap":10.56,"vm":17.87,"vmTalk":10.4,"vmWrap":7.45,"out":17.55,"outTalk":8.47,"outWrap":9.12},"web":2098,"walkin":5,"email":170,"aps":81,"mac":9,"uniteus":173,"funnel":{"selected":11160,"notScheduled":5939,"scheduled":5221,"notServicedRNA":2554,"accepted":2424,"retried":240,"serviced":2155,"stillInList":512,"totalAll":6540,"transfers":2,"subtract":1140},"bri":{"new":15,"dc":12,"served":124},"staffDetail":[{"name":"Ashlyn","team":"I&R","interactions":160,"perDay":7,"aht":19.7,"triage":6,"rescreen":0,"donr":3,"ccsp":0},{"name":"Bethany","team":"I&R","interactions":156,"perDay":7,"aht":16.93,"triage":0,"rescreen":0,"donr":0,"ccsp":0},{"name":"Candace","team":"I&R","interactions":0,"perDay":0,"aht":0,"triage":0,"rescreen":0,"donr":0,"ccsp":0},{"name":"Delethia","team":"I&R","interactions":281,"perDay":13,"aht":18.82,"triage":0,"rescreen":0,"donr":0,"ccsp":0},{"name":"Derenthia","team":"I&R","interactions":0,"perDay":0,"aht":0,"triage":0,"rescreen":0,"donr":0,"ccsp":0},{"name":"Derrick","team":"I&R","interactions":377,"perDay":17,"aht":14.63,"triage":0,"rescreen":0,"donr":0,"ccsp":0},{"name":"Don","team":"I&R","interactions":231,"perDay":11,"aht":22.42,"triage":0,"rescreen":0,"donr":0,"ccsp":0},{"name":"Lindsey","team":"I&R","interactions":147,"perDay":7,"aht":21.1,"triage":0,"rescreen":0,"donr":0,"ccsp":0},{"name":"Natalie","team":"I&R","interactions":307,"perDay":14,"aht":18.88,"triage":0,"rescreen":0,"donr":0,"ccsp":0},{"name":"Nicole","team":"I&R","interactions":244,"perDay":11,"aht":18.88,"triage":0,"rescreen":0,"donr":0,"ccsp":0},{"name":"Tamara","team":"I&R","interactions":216,"perDay":10,"aht":25.63,"triage":0,"rescreen":0,"donr":0,"ccsp":0},{"name":"Angie","team":"EDWP","interactions":138,"perDay":7,"aht":23.48,"triage":0,"rescreen":0,"donr":0,"ccsp":null},{"name":"Eslande","team":"EDWP","interactions":77,"perDay":4,"aht":23.1,"triage":0,"rescreen":0,"donr":0,"ccsp":null},{"name":"Melissa","team":"EDWP","interactions":63,"perDay":3,"aht":17.28,"triage":0,"rescreen":0,"donr":0,"ccsp":null},{"name":"Nelli","team":"EDWP","interactions":206,"perDay":9,"aht":18.6,"triage":0,"rescreen":0,"donr":0,"ccsp":null},{"name":"Sharon","team":"EDWP","interactions":230,"perDay":10,"aht":25.32,"triage":0,"rescreen":0,"donr":0,"ccsp":null},{"name":"Terri","team":"EDWP","interactions":249,"perDay":11,"aht":17.85,"triage":0,"rescreen":0,"donr":0,"ccsp":null},{"name":"Tia","team":"EDWP","interactions":197,"perDay":9,"aht":16.33,"triage":0,"rescreen":0,"donr":0,"ccsp":null},{"name":"Traci","team":"EDWP","interactions":264,"perDay":12,"aht":16.48,"triage":0,"rescreen":0,"donr":0,"ccsp":null},{"name":"Yaritza","team":"EDWP","interactions":362,"perDay":16,"aht":16.05,"triage":12,"rescreen":0,"donr":6,"ccsp":null},{"name":"Janeil","team":"HCBS","interactions":200,"perDay":9,"aht":16.87,"triage":8,"rescreen":null,"donr":3,"ccsp":null},{"name":"Judy","team":"HCBS","interactions":203,"perDay":9,"aht":18.4,"triage":32,"rescreen":null,"donr":19,"ccsp":null},{"name":"Kirsten","team":"HCBS","interactions":262,"perDay":12,"aht":19.4,"triage":20,"rescreen":null,"donr":0,"ccsp":null},{"name":"Megan","team":"HCBS","interactions":220,"perDay":10,"aht":17.32,"triage":92,"rescreen":null,"donr":33,"ccsp":null},{"name":"Ted","team":"HCBS","interactions":204,"perDay":9,"aht":20.3,"triage":70,"rescreen":null,"donr":28,"ccsp":null},{"name":"Derek","team":"Special Projects","interactions":154,"perDay":7,"aht":21.33,"triage":16,"uniteus":null,"donr":7,"ccsp":0},{"name":"Shalynda","team":"Special Projects","interactions":243,"perDay":11,"aht":19.2,"triage":9,"uniteus":null,"donr":0,"ccsp":0},{"name":"Alyssa","team":"BRI","interactions":113,"perDay":5,"aht":28.1,"triage":null,"enroll":6,"donr":null},{"name":"Melanie","team":"BRI","interactions":64,"perDay":3,"aht":39.7,"triage":null,"enroll":4,"donr":null},{"name":"Sundra","team":"BRI","interactions":58,"perDay":3,"aht":24.55,"triage":null,"enroll":5,"donr":null}],"epro":{"current":4489,"total":4991},"options":{"referrals":61,"outreach":17,"mfp":3,"nht":2,"transfers":1},"rs":[{"name":"Danielle","updated":131,"added":1,"p28":null,"p28Daily":null},{"name":"Kortney","updated":289,"added":0,"p28":538,"p28Daily":24},{"name":"Mark","updated":294,"added":0,"p28":364,"p28Daily":17}],"disp":{"APS referral":342,"Attempt to contact":1126,"CCSP provider / follow-up":73,"CCSP screen":462,"HCBS tier / rescreen":298,"I&R only":2149,"I&R prescreen":952,"Wrong number / misdirected":143,"Options counseling / other waivers":11,"Resource record updates":566,"Not dispositioned":640},"status":{"Call work":0.3001,"Lunch and breaks":0.123,"System and other":0.0343,"Meetings and consultation":0.0396,"Available (Ready)":0.3935,"Training":0.1095},"has":true},{"month":"August 2026","staff":[8.8,8.6,4.8],"sopCal":[12,12,12],"sopBus":[9,9,9],"avgWait":[12.57,12.57,12.57],"longWait":[13.88,13.88,13.88],"callsServiced":5516,"callsPerDay":[11,10,13],"callsPerHour":[1.43,1.2,1.56],"teamCalls8h":[137.6,96,62.4],"util":[0.8604,0.8423,0.8647],"survey":0.96,"hcbsDonr":[2,3,105],"triage":[8,9,248],"mde":[0.994,0.987,1],"teamAht":[18.03,23.05,18.62],"narrative":["August results show that ADRC staff maintained strong productivity, quality, and consumer satisfaction while experiencing significant capacity pressure. Staff utilization averaged 85.6%, exceeding the 80% target, with all three teams above target. Average calls handled per staff member increased from 10 per day in July to 11 in August. The team serviced 5,516 reportable calls, achieved 99.37% MDE quality, and received 96% post-call satisfaction. These results demonstrate that staff are actively engaged and delivering effective service despite the volume and complexity of the work.","Despite these strengths, average callback wait time was approximately 12.6 calendar days, the longest wait approached 14 calendar days, and 386 callbacks remained unserviced in the callback list. Telephone volume also does not fully reflect staff responsibilities: August included 1,888 web intakes, 155 information emails, 116 APS referrals, 176 Unite Us referrals, and 7 walk-ins, alongside screening, triage, documentation, and other program duties. These workload categories may overlap, but they demonstrate the breadth of responsibilities competing for staff time. The combination of above-target utilization, increased daily productivity, strong quality, and persistent delays supports a request for additional staffing capacity and targeted workload redistribution."],"aht":{"callback":20.47,"cbTalk":10.13,"cbWrap":10.64,"vm":15.25,"vmTalk":9.33,"vmWrap":5.92,"out":17.17,"outTalk":7.88,"outWrap":9.29},"web":1888,"walkin":7,"email":155,"aps":116,"mac":7,"uniteus":176,"funnel":{"selected":11028,"notScheduled":5754,"scheduled":6274,"notServicedRNA":2670,"accepted":2543,"retried":291,"serviced":2218,"stillInList":386,"totalAll":6806,"transfers":3,"subtract":1293},"bri":{"new":14,"dc":6,"served":126},"staffDetail":[{"name":"Ashlyn","team":"I&R","interactions":155,"perDay":7,"aht":22.13,"triage":8,"rescreen":null,"donr":2,"ccsp":0},{"name":"Bethany","team":"I&R","interactions":260,"perDay":12,"aht":17.08,"triage":0,"rescreen":0,"donr":0,"ccsp":0},{"name":"Candace","team":"I&R","interactions":24,"perDay":1,"aht":17.97,"triage":0,"rescreen":0,"donr":0,"ccsp":0},{"name":"Delethia","team":"I&R","interactions":268,"perDay":13,"aht":13.47,"triage":0,"rescreen":0,"donr":0,"ccsp":0},{"name":"Derenthia","team":"I&R","interactions":19,"perDay":1,"aht":21.78,"triage":0,"rescreen":0,"donr":0,"ccsp":0},{"name":"Derrick","team":"I&R","interactions":299,"perDay":14,"aht":17.08,"triage":0,"rescreen":0,"donr":0,"ccsp":0},{"name":"Don","team":"I&R","interactions":239,"perDay":11,"aht":13.02,"triage":0,"rescreen":0,"donr":0,"ccsp":0},{"name":"Lindsey","team":"I&R","interactions":87,"perDay":4,"aht":20.77,"triage":0,"rescreen":0,"donr":0,"ccsp":0},{"name":"Natalie","team":"I&R","interactions":291,"perDay":14,"aht":17.98,"triage":0,"rescreen":0,"donr":0,"ccsp":0},{"name":"Nicole","team":"I&R","interactions":213,"perDay":10,"aht":19.22,"triage":0,"rescreen":0,"donr":0,"ccsp":0},{"name":"Tamara","team":"I&R","interactions":177,"perDay":8,"aht":17.9,"triage":0,"rescreen":0,"donr":0,"ccsp":0},{"name":"Angie","team":"EDWP","interactions":150,"perDay":7,"aht":19.48,"triage":0,"rescreen":0,"donr":0,"ccsp":null},{"name":"Eslande","team":"EDWP","interactions":130,"perDay":6,"aht":20.08,"triage":0,"rescreen":0,"donr":0,"ccsp":null},{"name":"Melissa","team":"EDWP","interactions":140,"perDay":7,"aht":21.18,"triage":0,"rescreen":0,"donr":0,"ccsp":null},{"name":"Nelli","team":"EDWP","interactions":233,"perDay":11,"aht":17.33,"triage":3,"rescreen":0,"donr":2,"ccsp":null},{"name":"Sharon","team":"EDWP","interactions":183,"perDay":9,"aht":20.87,"triage":0,"rescreen":0,"donr":0,"ccsp":null},{"name":"Terri","team":"EDWP","interactions":274,"perDay":13,"aht":19.13,"triage":0,"rescreen":0,"donr":0,"ccsp":null},{"name":"Tia","team":"EDWP","interactions":211,"perDay":10,"aht":17.42,"triage":0,"rescreen":0,"donr":0,"ccsp":null},{"name":"Traci","team":"EDWP","interactions":229,"perDay":11,"aht":16.05,"triage":0,"rescreen":0,"donr":0,"ccsp":null},{"name":"Yaritza","team":"EDWP","interactions":232,"perDay":11,"aht":15.5,"triage":6,"rescreen":0,"donr":1,"ccsp":null},{"name":"Janeil","team":"HCBS","interactions":249,"perDay":12,"aht":16.3,"triage":2,"rescreen":null,"donr":2,"ccsp":0},{"name":"Judy","team":"HCBS","interactions":270,"perDay":13,"aht":17.92,"triage":18,"rescreen":null,"donr":11,"ccsp":0},{"name":"Kirsten","team":"HCBS","interactions":251,"perDay":12,"aht":17.3,"triage":20,"rescreen":null,"donr":2,"ccsp":0},{"name":"Megan","team":"HCBS","interactions":275,"perDay":13,"aht":21.12,"triage":107,"rescreen":null,"donr":42,"ccsp":0},{"name":"Ted","team":"HCBS","interactions":244,"perDay":12,"aht":20.47,"triage":101,"rescreen":null,"donr":48,"ccsp":0},{"name":"Derek","team":"Special Projects","interactions":151,"perDay":7,"aht":19.52,"triage":6,"uniteus":92,"donr":3,"ccsp":0},{"name":"Shalynda","team":"Special Projects","interactions":236,"perDay":11,"aht":18.38,"triage":9,"uniteus":83,"donr":2,"ccsp":0},{"name":"Alyssa","team":"BRI","interactions":94,"perDay":4,"aht":22.13,"triage":null,"enroll":4,"donr":null},{"name":"Melanie","team":"BRI","interactions":69,"perDay":3,"aht":38.38,"triage":null,"enroll":6,"donr":null},{"name":"Sundra","team":"BRI","interactions":75,"perDay":4,"aht":15.83,"triage":null,"enroll":4,"donr":null}],"options":{"referrals":63,"outreach":14,"mfp":8,"nht":3,"transfers":0},"epro":{"current":4525,"total":4831},"rs":[{"name":"Danielle","updated":65,"added":2,"p28":null,"p28Daily":null},{"name":"Kortney","updated":415,"added":0,"p28":415,"p28Daily":20},{"name":"Mark","updated":234,"added":0,"p28":640,"p28Daily":30}],"disp":{"APS referral":246,"Attempt to contact":1027,"Carrier-level rejection":156,"Not dispositioned":1238,"CCSP screen":397,"HCBS tier / rescreen":242,"I&R only":1890,"I&R prescreen":825,"CCSP provider / follow-up":70,"Resource record updates":846,"Wrong number / misdirected":141,"BRI call":14,"Options counseling / other waivers":22,"Refused cost share / estate recovery":2},"status":{"Call work":0.303,"Lunch and breaks":0.1247,"System and other":0.0397,"Meetings and consultation":0.0639,"Available (Ready)":0.3836,"Training":0.0851},"has":true},{"month":"September 2026","staff":[10.8,8.6,4.8],"sopCal":[15,15,15],"sopBus":[6,6,6],"avgWait":[5.86,5.9,5.94],"longWait":[14.86,14.86,14.86],"callsServiced":4612,"callsPerDay":[10,10,12],"callsPerHour":[1.37,1.54,1.68],"teamCalls8h":[120.8,123.2,67.2],"util":[0.8499,0.8366,0.8719],"survey":0.961,"hcbsDonr":[3,5,122],"triage":[8,13,317],"mde":[0.994,1,1],"teamAht":[19.67,20.02,18.65],"narrative":["September data indicates that ADRC's service delays are primarily a capacity issue rather than a staff productivity or performance issue. Staff utilization averaged 85.3%, exceeding the 80% target, while calls handled per hour increased and average handle time improved compared with August. At the same time, quality remained exceptionally strong, with a 99.8% MDE score and 96.1% post-call satisfaction.","Despite these results, average timely contact remained approximately six business days and more than 1,000 callbacks remained in the queue. In addition to telephone interactions, staff managed nearly 1,900 web intakes and significant screening, referral, documentation, email, and program responsibilities. The combination of high utilization, sustained productivity, strong quality, and continued service delays indicates that existing capacity is not sufficient to consistently absorb current demand and meet the required service standard. Additional capacity and/or workload redistribution is needed to close the gap."],"aht":{"callback":22.86,"cbTalk":11.65,"cbWrap":11.38,"vm":13.4,"vmTalk":9.18,"vmWrap":4.54,"out":16.93,"outTalk":7.22,"outWrap":9.7},"web":1916,"walkin":6,"email":149,"aps":136,"mac":6,"uniteus":216,"funnel":{"selected":10368,"notScheduled":4336,"scheduled":6032,"notServicedRNA":2325,"accepted":2861,"retried":149,"serviced":2686,"stillInList":1021,"totalAll":5819,"transfers":2,"subtract":1209},"bri":{"new":11,"dc":14,"served":131},"staffDetail":[{"name":"Ashlyn","team":"I&R","interactions":176,"perDay":8,"aht":15.82,"triage":8,"rescreen":0,"donr":3,"ccsp":null},{"name":"Bethany","team":"I&R","interactions":284,"perDay":14,"aht":19.37,"triage":0,"rescreen":0,"donr":0,"ccsp":0},{"name":"Candace","team":"I&R","interactions":137,"perDay":7,"aht":21.42,"triage":0,"rescreen":0,"donr":0,"ccsp":0},{"name":"Delethia","team":"I&R","interactions":262,"perDay":12,"aht":25.05,"triage":0,"rescreen":0,"donr":0,"ccsp":0},{"name":"Derenthia","team":"I&R","interactions":109,"perDay":5,"aht":21.65,"triage":0,"rescreen":0,"donr":0,"ccsp":0},{"name":"Derrick","team":"I&R","interactions":243,"perDay":12,"aht":16.32,"triage":0,"rescreen":0,"donr":0,"ccsp":0},{"name":"Don","team":"I&R","interactions":172,"perDay":8,"aht":20.77,"triage":0,"rescreen":0,"donr":0,"ccsp":0},{"name":"Lindsey","team":"I&R","interactions":199,"perDay":9,"aht":17.85,"triage":0,"rescreen":0,"donr":0,"ccsp":0},{"name":"Natalie","team":"I&R","interactions":307,"perDay":15,"aht":14.92,"triage":0,"rescreen":0,"donr":0,"ccsp":0},{"name":"Nicole","team":"I&R","interactions":240,"perDay":11,"aht":18.43,"triage":0,"rescreen":0,"donr":0,"ccsp":0},{"name":"Tamara","team":"I&R","interactions":223,"perDay":11,"aht":24.78,"triage":0,"rescreen":0,"donr":0,"ccsp":0},{"name":"Angie","team":"EDWP","interactions":144,"perDay":7,"aht":15.7,"triage":0,"rescreen":0,"donr":0,"ccsp":null},{"name":"Eslande","team":"EDWP","interactions":137,"perDay":7,"aht":23.2,"triage":0,"rescreen":0,"donr":0,"ccsp":null},{"name":"Melissa","team":"EDWP","interactions":116,"perDay":6,"aht":22.18,"triage":0,"rescreen":0,"donr":0,"ccsp":null},{"name":"Nelli","team":"EDWP","interactions":207,"perDay":10,"aht":18.03,"triage":4,"rescreen":0,"donr":1,"ccsp":null},{"name":"Sharon","team":"EDWP","interactions":156,"perDay":7,"aht":27.17,"triage":0,"rescreen":0,"donr":0,"ccsp":null},{"name":"Terri","team":"EDWP","interactions":239,"perDay":11,"aht":19.17,"triage":0,"rescreen":0,"donr":0,"ccsp":null},{"name":"Tia","team":"EDWP","interactions":249,"perDay":12,"aht":19.27,"triage":0,"rescreen":0,"donr":0,"ccsp":null},{"name":"Traci","team":"EDWP","interactions":238,"perDay":11,"aht":14.97,"triage":0,"rescreen":0,"donr":0,"ccsp":null},{"name":"Yaritza","team":"EDWP","interactions":284,"perDay":14,"aht":20.5,"triage":9,"rescreen":0,"donr":4,"ccsp":null},{"name":"Janeil","team":"HCBS","interactions":151,"perDay":7,"aht":17.77,"triage":52,"rescreen":0,"donr":14,"ccsp":1},{"name":"Judy","team":"HCBS","interactions":298,"perDay":14,"aht":18.77,"triage":9,"rescreen":0,"donr":7,"ccsp":null},{"name":"Kirsten","team":"HCBS","interactions":309,"perDay":15,"aht":15.3,"triage":50,"rescreen":0,"donr":8,"ccsp":1},{"name":"Megan","team":"HCBS","interactions":228,"perDay":11,"aht":21.08,"triage":96,"rescreen":0,"donr":43,"ccsp":null},{"name":"Ted","team":"HCBS","interactions":259,"perDay":12,"aht":20.3,"triage":110,"rescreen":0,"donr":50,"ccsp":null},{"name":"Derek","team":"Special Projects","interactions":174,"perDay":8,"aht":22.28,"triage":4,"uniteus":120,"donr":1,"ccsp":null},{"name":"Shalynda","team":"Special Projects","interactions":209,"perDay":9,"aht":18.88,"triage":9,"uniteus":96,"donr":3,"ccsp":null},{"name":"Alyssa","team":"BRI","interactions":99,"perDay":5,"aht":24.35,"triage":null,"enroll":4,"donr":null},{"name":"Melanie","team":"BRI","interactions":76,"perDay":4,"aht":36.77,"triage":null,"enroll":6,"donr":null},{"name":"Sundra","team":"BRI","interactions":100,"perDay":5,"aht":19.2,"triage":null,"enroll":1,"donr":null}],"options":{"referrals":74,"outreach":12,"mfp":4,"nht":2,"transfers":0},"epro":{"current":4881,"total":5155},"rs":[{"name":"Danielle","updated":20,"added":0,"p28":0,"p28Daily":0},{"name":"Kortney","updated":369,"added":0,"p28":376,"p28Daily":18},{"name":"Mark","updated":257,"added":0,"p28":558,"p28Daily":27}],"disp":{"APS referral":295,"I&R only":2403,"I&R prescreen":1010,"Attempt to contact":1170,"Wrong number / misdirected":172,"CCSP provider / follow-up":111,"CCSP screen":462,"HCBS tier / rescreen":336,"Options counseling / other waivers":43,"Refused cost share / estate recovery":94,"Carrier-level rejection":30,"Not dispositioned":77,"BRI call":260,"Resource record updates":948},"status":{"Call work":0.3347,"Lunch and breaks":0.1283,"System and other":0.0116,"Meetings and consultation":0.0484,"Training":0.0278},"has":true},{"month":"October 2026","has":false},{"month":"November 2026","has":false},{"month":"December 2026","has":false},{"month":"January 2027","has":false},{"month":"February 2027","has":false},{"month":"March 2027","has":false},{"month":"April 2027","has":false},{"month":"May 2027","has":false},{"month":"June 2027","has":false}];
+const SHORT = ["Jul","Aug","Sep","Oct","Nov","Dec","Jan","Feb","Mar","Apr","May","Jun"];
+const LONG = D.map(m=>m.month.split(" ")[0]);
+const TEAMS = ["I&R","EDWP","HCBS"];
+const TCOL = {"I&R":"var(--serieNavy)","EDWP":"var(--accent2)","HCBS":"var(--teal)","Special Projects":"var(--warm)","BRI":"var(--soft)"};
+const MONO = "var(--mono)";
+const avail = D.map((m,i)=>m.has?i:-1).filter(i=>i>=0);
+const S = {mi: avail[avail.length-1], per:"m", tab:"summary", team:"All", sTeam:"All", sMetric:"interactions", disp:"count", staff:null, wf:"all"};
+const QIDS=q=>[0,1,2].map(k=>q*3+k).filter(i=>D[i].has);
+
+const $ = (s,el=document)=>el.querySelector(s);
+const fmt = (v,d=0)=> v==null||isNaN(v) ? "—" : Number(v).toLocaleString("en-US",{minimumFractionDigits:d,maximumFractionDigits:d});
+const pct = (v,d=0)=> v==null ? "—" : fmt(v*100,d)+"%";
+const chg = (a,b)=> (a==null||b==null||b===0) ? null : (a-b)/b;
+const mean = a=>{a=a.filter(x=>x!=null);return a.length?a.reduce((s,x)=>s+x,0)/a.length:null};
+const W = el=>Math.max(280, el.clientWidth);
+const PIDS=()=> S.per==="m"?[S.mi]: S.per==="FYTD"?avail.slice(): QIDS(+S.per[1]-1);
+const END=()=>PIDS().at(-1);
+const SEL=i=>PIDS().includes(i);
+const UPTO=()=>avail.filter(i=>i<=END());
+const isM=()=>S.per==="m";
+const QLAB=q=>`Q${q+1} (${SHORT[q*3]}–${SHORT[q*3+2]})`;
+const PL=()=> isM()?LONG[S.mi]: S.per==="FYTD"?"FY2027 to date":`Q${S.per[1]} FY2027`;
+const PS=()=> isM()?SHORT[S.mi]: S.per;
+const PPL=()=> isM()?LONG[S.mi-1]: `Q${+S.per[1]-1}`;
+const PPS=()=> isM()?SHORT[S.mi-1]: `Q${+S.per[1]-1}`;
+const PW=()=> isM()?"month over month":"quarter over quarter";
+const AGC={};
+function aggregate(ids,label){
+  const key=ids.join(","); if(AGC[key]) return AGC[key];
+  const M=ids.map(i=>D[i]), n=M.length;
+  if(n===1) return M[0];
+  const sm=f=>M.reduce((a,m)=>a+(f(m)||0),0), av=f=>mean(M.map(f));
+  const arr=(f,how)=>[0,1,2].map(k=>how==="sum"?sm(m=>f(m)[k]):av(m=>f(m)[k]));
+  const o={month:label,has:true,agg:true};
+  ["callsServiced","web","email","walkin","aps","mac","uniteus"].forEach(k=>o[k]=sm(m=>m[k]));
+  o.survey=av(m=>m.survey);
+  ["staff","sopCal","sopBus","avgWait","callsPerDay","callsPerHour","teamCalls8h","util","mde","teamAht"].forEach(k=>o[k]=arr(m=>m[k],"avg"));
+  ["triage","hcbsDonr"].forEach(k=>o[k]=arr(m=>m[k],"sum"));
+  o.longWait=[0,1,2].map(k=>Math.max(...M.map(m=>m.longWait[k])));
+  o.aht={}; Object.keys(M[0].aht).forEach(k=>o.aht[k]=av(m=>m.aht[k]));
+  o.funnel={}; Object.keys(M[0].funnel).forEach(k=>o.funnel[k]=sm(m=>m.funnel[k])); o.funnel.stillInList=M.at(-1).funnel.stillInList;
+  o.disp={}; M.forEach(m=>Object.entries(m.disp).forEach(([k,v])=>o.disp[k]=(o.disp[k]||0)+v));
+  o.status={}; const sk=[...new Set(M.flatMap(m=>Object.keys(m.status)))]; sk.forEach(k=>o.status[k]=mean(M.map(m=>m.status[k]??null)));
+  const names=[...new Set(M.flatMap(m=>m.staffDetail.map(s=>s.name)))];
+  o.staffDetail=names.map(nm=>{const rs=M.map(m=>m.staffDetail.find(s=>s.name===nm)).filter(Boolean);
+    const inter=rs.reduce((a,s)=>a+(s.interactions||0),0), w=rs.filter(s=>s.interactions>0&&s.aht!=null);
+    const nn=f=>rs.some(s=>s[f]!=null)?rs.reduce((a,s)=>a+(s[f]||0),0):null;
+    return {name:nm,team:rs.at(-1).team,interactions:inter,perDay:mean(rs.map(s=>s.perDay)),aht:w.length?w.reduce((a,s)=>a+s.aht*s.interactions,0)/w.reduce((a,s)=>a+s.interactions,0):null,triage:nn("triage"),donr:nn("donr"),ccsp:nn("ccsp"),enroll:nn("enroll"),uniteus:nn("uniteus"),rescreen:nn("rescreen")}});
+  const B=M.filter(m=>m.bri); o.bri=B.length?{new:B.reduce((a,m)=>a+m.bri.new,0),dc:B.reduce((a,m)=>a+m.bri.dc,0),served:B.at(-1).bri.served}:null;
+  o.epro=M.filter(m=>m.epro).at(-1)?.epro||null;
+  o.narrative=M.flatMap(m=>m.narrative||[]);
+  o.rs=M[0].rs.map(r=>{const rr=M.map(m=>m.rs.find(x=>x.name===r.name)||{}); const nn=f=>rr.some(x=>x[f]!=null)?rr.reduce((a,x)=>a+(x[f]||0),0):null;
+    return {name:r.name,updated:nn("updated"),added:nn("added"),p28:nn("p28"),p28Daily:mean(rr.map(x=>x.p28Daily??null))}});
+  o.options={}; ["referrals","outreach","mfp","nht","transfers"].forEach(k=>{const v=M.map(m=>(m.options||{})[k]).filter(x=>x!=null);o.options[k]=v.length?v.reduce((a,b)=>a+b,0):null});
+  return AGC[key]=o;
+}
+const cur = ()=> isM()?D[S.mi]:aggregate(PIDS(),PL());
+const prev = ()=>{
+  if(isM()) return (S.mi>0 && D[S.mi-1].has) ? D[S.mi-1] : null;
+  if(S.per==="FYTD") return null;
+  const q=+S.per[1]-1; if(q===0) return null; const ids=QIDS(q-1); return ids.length?aggregate(ids,`Q${q}`):null;
+};
+function marker(x,top,h,bot){const ids=PIDS(); if(ids.length===1) return ln(x(ids[0]),top-6,x(ids[0]),h-bot,"var(--warm)",1,"2 3");
+  const a=x(ids[0])-10,b=x(ids.at(-1))+10; return `<rect x="${a}" y="${top-6}" width="${b-a}" height="${h-bot-top+6}" style="fill:var(--tk)"/>`;}
+const esc = s=>String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;");
+function svg(w,h,inner){return `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" role="img">${inner}</svg>`}
+function t(x,y,s,o={}){return `<text x="${x}" y="${y}" font-size="${o.size||12}" text-anchor="${o.a||"start"}" style="fill:${o.c||"var(--slate)"};font-weight:${o.w||400};font-family:${o.mono?MONO:"var(--sans)"}" ${o.extra||""}>${esc(s)}</text>`}
+function r(x,y,w,h,c,tip,extra=""){return `<rect x="${x}" y="${y}" width="${Math.max(0,w)}" height="${Math.max(0,h)}" style="fill:${c}" ${tip?`data-tip="${esc(tip)}"`:""} ${extra}/>`}
+function ln(x1,y1,x2,y2,c="var(--line)",w=1,dash=""){return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" style="stroke:${c};stroke-width:${w}" ${dash?`stroke-dasharray="${dash}"`:""}/>`}
+function delta(a,b,goodUp=true,mode="pct",u=""){
+  if(a==null||b==null) return `<span class="neu">—</span>`;
+  const d = mode==="pp" ? (a-b)*100 : mode==="abs" ? a-b : chg(a,b)*100;
+  if(d==null||isNaN(d)) return `<span class="neu">—</span>`;
+  const z = Math.abs(d)<0.05; const up=d>0;
+  const cls = z?"neu":((up===goodUp)?"good":"bad");
+  const unit = mode==="pp"?" pts":mode==="abs"?u:"%";
+  return `<span class="${cls} mono">${z?"■":up?"▲":"▼"} ${fmt(Math.abs(d),1)}${unit}</span>`;
+}
+function dirWord(a,b,up="rose",dn="fell"){return a>=b?up:dn}
+
+/* ---------- controls ---------- */
+function buildMonths(){
+  const el=$("#months");
+  el.innerHTML = SHORT.map((s,i)=>`<button type="button" class="chip ${isM()&&i===S.mi?"on":""} ${i%3===0&&i?"qgap":""}" data-i="${i}" ${D[i].has?"":"disabled"} aria-pressed="${isM()&&i===S.mi}" title="${(D[i].has?D[i].month:D[i].month+": not yet reported")+" (Q"+(Math.floor(i/3)+1)+")"}">${s}</button>`).join("");
+  el.querySelectorAll("button").forEach(b=>{const on=isM()&&+b.dataset.i===S.mi; b.classList.toggle("on",on); b.setAttribute("aria-pressed",on)});
+  el.onclick=e=>{const b=e.target.closest("button");if(b&&!b.disabled){S.mi=+b.dataset.i;S.per="m";render()}};
+  const pe=$("#periods");
+  pe.innerHTML=["Q1","Q2","Q3","Q4","FYTD"].map(p=>{const ok=p==="FYTD"||QIDS(+p[1]-1).length; return `<button type="button" class="chip ${S.per===p?"on":""}" data-p="${p}" ${ok?"":"disabled"} aria-pressed="${S.per===p}" title="${p==="FYTD"?"FY2027 to date, all reported months":QLAB(+p[1]-1)+(ok?"":": not yet reported")}">${p}</button>`}).join("");
+  pe.onclick=e=>{const b=e.target.closest("button");if(b&&!b.disabled){S.per=b.dataset.p;render()}};
+  const ids=PIDS();
+  $("#ctxLabel").textContent=`${isM()?D[S.mi].month:PL()+" · "+ids.map(i=>SHORT[i]).join(", ")} · ${avail.length} of 12 months reported`;
+}
+function pills(id,opts,key,cb,label){
+  const el=$("#"+id);
+  el.innerHTML=(label?`<span class="glab">${label}</span>`:"")+opts.map(([v,l])=>`<button type="button" class="pill ${S[key]===v?"on":""}" data-v="${v}" aria-pressed="${S[key]===v}">${l}</button>`).join("");
+  el.onclick=e=>{const b=e.target.closest("button");if(b){S[key]=b.dataset.v;el.querySelectorAll("button").forEach(x=>{const on=x.dataset.v===S[key];x.classList.toggle("on",on);x.setAttribute("aria-pressed",on)});cb()}};
+}
+$("#tabChips").onclick=e=>{const b=e.target.closest("button");if(!b)return;S.tab=b.dataset.tab;
+  document.querySelectorAll("#tabChips .chip").forEach(c=>{const on=c===b;c.classList.toggle("on",on);c.setAttribute("aria-selected",on)});
+  document.querySelectorAll(".tabpane").forEach(p=>p.classList.toggle("on",p.id==="tab-"+S.tab));renderCharts()};
+$("#themeBtn").onclick=()=>{const rt=document.documentElement;const dark=getComputedStyle(rt).getPropertyValue("--paper").trim().toLowerCase()!=="#f6f4ef";rt.setAttribute("data-theme",dark?"light":"dark")};
+
+/* ---------- KPI strip ---------- */
+function renderKPIs(){
+  const m=cur(),p=prev(),u=mean(m.util);
+  const k=[
+    ["Calls serviced",fmt(m.callsServiced),"",p?`${delta(m.callsServiced,p.callsServiced)} vs ${PPS()}`:(isM()?"FY2027 baseline":"No prior period")],
+    ["Callbacks serviced",fmt(m.funnel.serviced),"",`${pct(m.funnel.serviced/m.funnel.scheduled)} of caller-scheduled`],
+    ["Callbacks still in list",fmt(m.funnel.stillInList),p&&m.funnel.stillInList>p.funnel.stillInList?"bad":"",p?`${delta(m.funnel.stillInList,p.funnel.stillInList,false)} vs ${PPS()}`:"Awaiting service at month end"],
+    ["Avg callback wait",fmt(m.avgWait[0],1)+" days","",`Longest ${fmt(m.longWait[0],1)} days`],
+    ["Team utilization",pct(u,1),u<0.8?"bad":"",`Target 80% <div class="meter"><i style="width:${Math.min(100,u*100)}%"></i><b style="left:80%"></b></div>`],
+  ];
+  $("#kpis").innerHTML=k.map(([l,v,c,n])=>`<div class="kpi"><div class="label">${l}</div><div class="val ${c}">${v}</div><div class="note">${n}</div></div>`).join("");
+}
+
+/* ---------- summary ---------- */
+function renderSummary(){
+  $("#findH").textContent=isM()?"Key findings for the month":`Key findings for ${PL()}`;
+  const m=cur(), p=prev(), mo=PL(), pm=p?PPL():"";
+  const F=[];
+  const ytd=UPTO().reduce((s,i)=>s+D[i].callsServiced,0);
+  if(p){const c=chg(m.callsServiced,p.callsServiced);
+    F.push([c<0?"bad":"good",fmt(m.callsServiced),`Reported calls serviced ${dirWord(c,0)} ${pct(Math.abs(c),1)} from ${pm}`,`${pm} closed at ${fmt(p.callsServiced)}. FY2027 calls serviced to date total ${fmt(ytd)}.`]);
+  } else F.push(["",fmt(m.callsServiced),`Calls serviced in ${mo}, the FY2027 baseline`,`Gross serviced interactions, including callbacks, voicemails and outbound calls, were ${fmt(m.funnel.totalAll)}.`]);
+  const bl=m.funnel.stillInList, pbl=p?p.funnel.stillInList:null;
+  F.push([p&&bl>pbl?"bad":"good",fmt(bl),p?`Callbacks awaiting service ${dirWord(bl,pbl)} ${pct(Math.abs(chg(bl,pbl)),0)} from ${pm}`:`Callbacks awaiting service at the end of ${mo}`,`Average wait was ${fmt(m.avgWait[0],1)} days and the longest ${fmt(m.longWait[0],1)} days; ${pct(m.funnel.serviced/m.funnel.scheduled)} of caller-scheduled callbacks were serviced.`]);
+  const u=m.util, met=u.filter(x=>x>=0.8).length, tr=m.triage[2], ptr=p?p.triage[2]:null;
+  F.push([met===3?"good":"bad",pct(mean(u),1),`${met===3?"All three teams":met+" of 3 teams"} above the 80% utilization target`,`Range ${pct(Math.min(...u),1)}–${pct(Math.max(...u),1)}; post-call satisfaction ${pct(m.survey,1)}. HCBS completed ${fmt(tr)} triages${p?` (${dirWord(tr,ptr,"up","down")} ${pct(Math.abs(chg(tr,ptr)),0)})`:""} and ${fmt(m.hcbsDonr[2])} DON-Rs.`]);
+  const ptw=p?p.web:null, rf=m.aps+m.uniteus+m.mac, prf=p?p.aps+p.uniteus+p.mac:null;
+  F.push([p&&m.web<ptw?"bad":"",fmt(m.web),p?`Web intakes ${dirWord(m.web,ptw)} ${pct(Math.abs(chg(m.web,ptw)),1)} from ${pm}`:`Web intakes received in ${mo}`,`Outbound referrals (APS, UniteUs, MAC) totaled ${fmt(rf)}${p?`, ${dirWord(rf,prf,"up","down")} ${pct(Math.abs(chg(rf,prf)),0)}`:""}; ${fmt(m.email)} information emails and ${fmt(m.walkin)} walk-ins.`]);
+  $("#findings").innerHTML=F.map(x=>`<div class="find ${x[0]}"><div class="big">${x[1]}</div><h4>${x[2]}</h4><p>${x[3]}</p></div>`).join("");
+
+  const rows=[
+    ["Calls serviced (reported)",x=>x.callsServiced,0,true,"pct"],
+    ["Callbacks serviced",x=>x.funnel.serviced,0,true,"pct"],
+    ["Callbacks still in list",x=>x.funnel.stillInList,0,false,"pct"],
+    ["Avg callback wait, days",x=>x.avgWait[0],1,false,"abs"," days"],
+    ["Callback handle time, min",x=>x.aht.callback,1,false,"abs"," min"],
+    ["Team utilization",x=>mean(x.util),3,true,"pp"],
+    ["Post-call satisfaction",x=>x.survey,3,true,"pp"],
+    ["Web intakes",x=>x.web,0,true,"pct"],
+  ];
+  const months=UPTO();
+  $("#kpiTable").innerHTML=`<thead><tr><th>Indicator</th><th class="r">${PS()}</th><th class="r">vs prior</th><th class="r">Trend</th></tr></thead><tbody>`+
+    rows.map(([lab,f,d,gu,mode,u=""])=>{const v=f(m),pv=p?f(p):null;
+      return `<tr><td>${lab}</td><td class="r"><b>${mode==="pp"?pct(v,1):fmt(v,d)}</b></td><td class="r">${delta(v,pv,gu,mode,u)}</td><td class="r">${spark(months.map(i=>f(D[i])))}</td></tr>`}).join("")+`</tbody>`;
+}
+function spark(vals){
+  const w=70,h=20; if(vals.length<2) return `<svg class="spark" width="${w}" height="${h}">${ln(0,h/2,w,h/2,"var(--line)",1,"2 3")}</svg>`;
+  const mn=Math.min(...vals),mx=Math.max(...vals),rg=(mx-mn)||1;
+  const pts=vals.map((v,i)=>[4+i*(w-8)/(vals.length-1), 3+(h-6)*(1-(v-mn)/rg)]);
+  return `<svg class="spark" width="${w}" height="${h}"><polyline points="${pts.map(p=>p.join(",")).join(" ")}" style="fill:none;stroke:var(--serieNavy);stroke-width:1.5"/><circle cx="${pts.at(-1)[0]}" cy="${pts.at(-1)[1]}" r="3" style="fill:var(--accent)"/></svg>`;
+}
+
+/* ---------- exhibit 1 ---------- */
+function ex1(){
+  const el=$("#ex1 [data-c]"), w=W(el), h=250, top=28, bot=30;
+  const vals=D.map(m=>m.has?m.callsServiced:null), mx=Math.max(...vals.filter(Boolean))*1.08;
+  const bw=w/12, bar=Math.min(46,bw*0.62);
+  let g="";
+  [0.25,0.5,0.75,1].forEach(f=>{const y=h-bot-(h-top-bot)*f;g+=ln(0,y,w,y,"var(--grid)")});
+  g+=ln(0,h-bot,w,h-bot,"var(--slate)");
+  D.forEach((m,i)=>{
+    const cx=bw*i+bw/2;
+    if(m.has){
+      const bh=(h-top-bot)*(vals[i]/mx), y=h-bot-bh, c=SEL(i)?"var(--accent)":"var(--serieNavy)";
+      g+=r(cx-bar/2,y,bar,bh,c,`${m.month}: ${fmt(vals[i])} calls serviced`,`data-i="${i}" style="fill:${c};cursor:pointer"`);
+      g+=t(cx,y-8,fmt(vals[i]),{a:"middle",w:500,c:"var(--ink)",mono:1,size:11});
+    } else g+=`<rect x="${cx-bar/2}" y="${h-bot-24}" width="${bar}" height="24" style="fill:none;stroke:var(--warm);stroke-dasharray:3 3"/>`;
+    g+=t(cx,h-bot+18,SHORT[i],{a:"middle",c:SEL(i)?"var(--ink)":"var(--muted)",w:SEL(i)?600:400,mono:1,size:11});
+    if(i%3===0&&i) g+=ln(bw*i,top-14,bw*i,h-bot+24,"var(--line)",1,"2 3");
+  });
+  [0,1,2,3].forEach(q=>g+=t(bw*(q*3)+6,top-16,`Q${q+1}`,{c:"var(--accent)",size:11,mono:1,w:500}));
+  el.innerHTML=svg(w,h,g);
+  el.querySelectorAll("rect[data-i]").forEach(b=>b.onclick=()=>{S.mi=+b.dataset.i;S.per="m";render()});
+  const m=cur(),p=prev(),ids=UPTO(),ytd=ids.reduce((s,i)=>s+D[i].callsServiced,0);
+  $("#ex1 [data-t]").textContent = p ? `Reported calls serviced ${dirWord(m.callsServiced,p.callsServiced)} ${pct(Math.abs(chg(m.callsServiced,p.callsServiced)),1)} ${PW()} in ${PL()}, to ${fmt(m.callsServiced)}.` : `The ADRC serviced ${fmt(m.callsServiced)} calls in ${PL()}${isM()?", the first month of FY2027":S.per==="FYTD"?"":", the first quarter of FY2027"}.`;
+  $("#ex1 [data-o]").innerHTML=`<div><b>${fmt(ytd)}</b>FY2027 to date</div><div><b>${fmt(ytd/ids.length)}</b>Monthly average</div><div><b>${fmt(m.callsServiced/m.staff.reduce((a,b)=>a+b,0))}</b>Calls per team FTE</div>`;
+}
+
+/* ---------- horizontal bars ---------- */
+function hbars(el,items,o={}){
+  const w=W(el), lw=o.labelW||Math.min(190,w*0.38), rh=o.rowH||30, vw=o.valW||70, top=4;
+  const h=top+items.length*rh+4;
+  const mx=o.max||Math.max(...items.map(i=>i.value||0))||1, bwMax=w-lw-vw;
+  let g="";
+  items.forEach((it,k)=>{
+    const y=top+k*rh, bh=Math.min(16,rh-10), bw=bwMax*((it.value||0)/mx);
+    g+=t(0,y+bh/2+4,it.label,{c:it.dim?"var(--muted)":"var(--slate)",w:it.bold?600:400});
+    g+=r(lw,y,bw,bh,it.color||"var(--serieNavy)",it.tip);
+    g+=t(lw+bw+6,y+bh/2+4,it.vlabel??fmt(it.value),{w:500,c:"var(--ink)",mono:1,size:11});
+  });
+  if(o.ref!=null){const x=lw+bwMax*(o.ref/mx); g+=ln(x,0,x,top+items.length*rh-6,"var(--red)",1.5,"4 3")+t(x+4,top+items.length*rh+8,o.refLabel||"",{size:11,c:"var(--red)",mono:1});}
+  el.innerHTML=svg(w,h+(o.ref!=null?14:0),g);
+}
+
+/* ---------- exhibit 2 ---------- */
+function ex2(){
+  const f=cur().funnel, el=$("#ex2 [data-c]");
+  const items=[
+    {label:"Selected by caller",value:f.selected,color:"var(--warm)"},
+    {label:"Scheduled by caller",value:f.scheduled,color:"var(--soft)"},
+    {label:"Accepted by agent",value:f.accepted,color:"var(--serieNavy)"},
+    {label:"Serviced",value:f.serviced,color:"var(--accent)",bold:true},
+  ].map(i=>({...i,vlabel:`${fmt(i.value)} (${pct(i.value/f.selected)})`,tip:`${i.label}: ${fmt(i.value)} — ${pct(i.value/f.selected,1)} of selected`}));
+  hbars(el,items,{rowH:38,valW:110,labelW:Math.min(150,W(el)*0.36)});
+  $("#ex2 [data-t]").textContent=`${pct(f.serviced/f.scheduled)} of caller-scheduled callbacks were serviced in ${PL()}; ${fmt(f.stillInList)} remain in the list.`;
+  $("#ex2 [data-o]").innerHTML=`<div><b>${fmt(f.notScheduled)}</b>Not scheduled</div><div><b>${fmt(f.notServicedRNA)}</b>Not serviced</div><div><b>${fmt(f.retried)}</b>Retried</div>`;
+}
+
+/* ---------- exhibit 3 ---------- */
+function ex3(){
+  const m=cur(), f=m.funnel, el=$("#ex3 [data-c]"), w=W(el), h=270, top=26, bot=46;
+  const steps=[["All serviced interactions",f.totalAll,"total"],["Transfers",f.transfers,"up"],["BRI, RS and transfer queues",-f.subtract,"dn"],["Reported calls serviced",m.callsServiced,"total"]];
+  const mx=(f.totalAll+f.transfers)*1.05, sc=v=>(h-top-bot)*v/mx, cw=w/4, bw=Math.min(64,cw*0.55);
+  let run=0,g=ln(0,h-bot,w,h-bot,"var(--slate)");
+  steps.forEach(([lab,v,k],i)=>{
+    const cx=cw*i+cw/2; let y0,y1;
+    if(k==="total"){y0=0;y1=v;run=v}else{y0=run;y1=run+v;run=y1}
+    const lo=Math.min(y0,y1),hi=Math.max(y0,y1);
+    const c=k==="total"?(i===3?"var(--accent)":"var(--serieNavy)"):k==="up"?"var(--teal)":"var(--red)";
+    g+=r(cx-bw/2,h-bot-sc(hi),bw,Math.max(1.5,sc(hi-lo)),c,`${lab}: ${v<0?"−":""}${fmt(Math.abs(v))}`);
+    g+=t(cx,h-bot-sc(hi)-8,(k==="dn"?"−":k==="up"?"+":"")+fmt(Math.abs(v)),{a:"middle",w:500,c:"var(--ink)",mono:1,size:11});
+    if(i<3){const nx=cw*(i+1)+cw/2; g+=ln(cx+bw/2,h-bot-sc(run),nx-bw/2,h-bot-sc(run),"var(--muted)",1,"2 2");}
+    const words=lab.split(" "),lines=[];let cl="";words.forEach(wd=>{if((cl+" "+wd).trim().length>14){lines.push(cl.trim());cl=wd}else cl+=" "+wd});lines.push(cl.trim());
+    lines.forEach((s,j)=>g+=t(cx,h-bot+16+j*13,s,{a:"middle",size:11,c:"var(--muted)"}));
+  });
+  el.innerHTML=svg(w,h,g);
+  $("#ex3 [data-t]").textContent=`Excluding ${fmt(f.subtract)} BRI, resource specialist and transfer-queue calls brings ${fmt(f.totalAll)} serviced interactions to the ${fmt(m.callsServiced)} reported.`;
+}
+
+/* ---------- exhibit 4 ---------- */
+function ex4(){
+  const m=cur(),p=prev(), el=$("#ex4 [data-c]");
+  const rows=[
+    ["Staff (FTE)",x=>x.staff,v=>fmt(v,1),null,"abs"],
+    ["Utilization (target 80%)",x=>x.util,null,true,"pp"],
+    ["Calls handled per day, per staff",x=>x.callsPerDay,v=>fmt(v),true,"abs"],
+    ["Calls per hour",x=>x.callsPerHour,v=>fmt(v,2),true,"abs"],
+    ["Team handle time, min",x=>x.teamAht,v=>fmt(v,1),false,"abs"],
+    ["Team calls per 8-hour day",x=>x.teamCalls8h,v=>fmt(v,1),true,"abs"],
+    ["Triages",x=>x.triage,v=>fmt(v),true,"abs"],
+    ["HCBS DON-Rs",x=>x.hcbsDonr,v=>fmt(v),true,"abs"],
+    ["MDE accuracy",x=>x.mde,v=>pct(v,1),true,"pp"],
+  ];
+  const dim=i=>S.team!=="All"&&TEAMS[i]!==S.team?"dim":"";
+  const names={"I&R":"Team 1 I&amp;R","EDWP":"Team 2 EDWP","HCBS":"Team 3 HCBS"};
+  el.innerHTML=`<thead><tr><th>Measure</th>${TEAMS.map((tm,i)=>`<th class="r ${dim(i)}"><span style="display:inline-block;width:9px;height:9px;background:${TCOL[tm]};margin-right:6px"></span>${names[tm]}</th>`).join("")}<th class="r">Average or total</th></tr></thead><tbody>`+
+  rows.map(([lab,f,fm,gu,mode])=>{
+    const v=f(m),pv=p?f(p):null;
+    const cells=[0,1,2].map(i=>{
+      const x=v[i];
+      const s=lab.startsWith("Util")?`<span class="ut"><span class="ubar"><span style="width:${Math.min(100,x*100)}%"></span><em style="left:80%"></em></span>${pct(x,1)}</span>`:fm(x);
+      return `<td class="r ${dim(i)}">${s}${gu===null?"":`<span class="dd">${delta(x,pv?pv[i]:null,gu,mode)}</span>`}</td>`;
+    }).join("");
+    const isCnt=lab==="Triages"||lab==="HCBS DON-Rs", agg=a=>isCnt?a.reduce((x,y)=>x+(y||0),0):mean(a);
+    const av=agg(v), pav=pv?agg(pv):null;
+    const avs=isCnt?fmt(av)+" total":lab.startsWith("Util")||lab.startsWith("MDE")?pct(av,1):fmt(av,lab.startsWith("Calls per")?2:1);
+    return `<tr><td>${lab}</td>${cells}<td class="r"><b>${avs}</b>${gu===null?"":`<span class="dd">${delta(av,pav,gu,mode)}</span>`}</td></tr>`;
+  }).join("")+`</tbody>`;
+  const u=m.util, met=u.filter(x=>x>=0.8).length, trShare=m.triage[2]/m.triage.reduce((a,b)=>a+b,0);
+  $("#ex4 [data-t]").textContent=`${met===3?"All three teams exceeded":met+" of 3 teams met"} the 80% utilization target in ${PL()}; the HCBS team performed ${pct(trShare)} of all triages.`;
+}
+
+/* ---------- exhibit 5 ---------- */
+function ex5(){
+  const a=cur().aht, el=$("#ex5 [data-c]"), w=W(el), lw=90, rh=44, vw=56;
+  const rows=[["Callbacks",a.cbTalk,a.cbWrap,a.callback],["Voicemail",a.vmTalk,a.vmWrap,a.vm],["Outbound",a.outTalk,a.outWrap,a.out]];
+  const mx=Math.max(...rows.map(x=>x[1]+x[2])), bwm=w-lw-vw; let g="";
+  rows.forEach(([lab,tk,wr],k)=>{
+    const y=k*rh+6,bh=22,t1=bwm*tk/mx,t2=bwm*wr/mx;
+    g+=t(0,y+bh/2+4,lab);
+    g+=r(lw,y,t1,bh,"var(--serieNavy)",`${lab} talk: ${fmt(tk,1)} min`);
+    g+=r(lw+t1,y,t2,bh,"var(--accent)",`${lab} wrap: ${fmt(wr,1)} min`);
+    if(t1>34) g+=t(lw+t1/2,y+bh/2+4,fmt(tk,1),{a:"middle",c:"var(--card)",size:11,mono:1});
+    if(t2>34) g+=t(lw+t1+t2/2,y+bh/2+4,fmt(wr,1),{a:"middle",c:"#1c1304",size:11,mono:1});
+    g+=t(lw+t1+t2+6,y+bh/2+4,fmt(tk+wr,1),{w:500,c:"var(--ink)",mono:1,size:11});
+  });
+  el.innerHTML=svg(w,rows.length*rh+4,g);
+  $("#ex5 [data-t]").textContent=`Wrap time accounts for ${pct(a.cbWrap/(a.cbTalk+a.cbWrap))} of callback handle time, which averaged ${fmt(a.callback,1)} minutes in ${PL()}.`;
+}
+
+/* ---------- exhibit 6 ---------- */
+function ex6(){
+  const el=$("#ex6 [data-c]"), w=W(el), h=230, top=24, bot=28, pad=14;
+  const ser=[["avgWait","var(--accent)"],["longWait","var(--serieNavy)"]];
+  const mx=Math.max(...avail.map(i=>D[i].longWait[0]))*1.15, x=i=>pad+i*(w-2*pad)/11, y=v=>top+(h-top-bot)*(1-v/mx);
+  let g="";
+  [0.25,0.5,0.75,1].forEach(f=>{const yy=h-bot-(h-top-bot)*f;g+=ln(0,yy,w,yy,"var(--grid)")});
+  g+=ln(0,h-bot,w,h-bot,"var(--slate)");
+  SHORT.forEach((s,i)=>g+=t(x(i),h-bot+18,s,{a:"middle",size:11,mono:1,c:SEL(i)?"var(--ink)":D[i].has?"var(--muted)":"var(--warm)",w:SEL(i)?600:400}));
+  g+=marker(x,top,h,bot);
+  ser.forEach(([k,c])=>{
+    const pts=avail.map(i=>[x(i),y(D[i][k][0]),D[i][k][0],i]);
+    g+=`<polyline points="${pts.map(p=>p[0]+","+p[1]).join(" ")}" style="fill:none;stroke:${c};stroke-width:2.2"/>`;
+    pts.forEach(p=>{g+=`<circle cx="${p[0]}" cy="${p[1]}" r="${SEL(p[3])?5:3.5}" style="fill:${c};stroke:var(--card);stroke-width:1.5" data-tip="${esc(D[p[3]].month+": "+(k==="avgWait"?"average":"longest")+" wait "+fmt(p[2],1)+" days")}"/>`;
+      g+=t(p[0],k==="avgWait"?p[1]+18:p[1]-10,fmt(p[2],1),{a:"middle",size:11,w:500,c:"var(--ink)",mono:1})});
+  });
+  el.innerHTML=svg(w,h,g);
+  const m=cur(),p=prev();
+  $("#ex6 [data-sop]").textContent=`${m.sopCal[0]} calendar days and ${m.sopBus[0]} business days for ${PL()}`;
+  $("#ex6 [data-t]").textContent = p ? `Average callback wait ${dirWord(m.avgWait[0],p.avgWait[0])} to ${fmt(m.avgWait[0],1)} days in ${PL()}, while the longest wait ${dirWord(m.longWait[0],p.longWait[0],"lengthened","shortened")} to ${fmt(m.longWait[0],1)} days.` : `Callers waited an average of ${fmt(m.avgWait[0],1)} days for a callback in ${PL()}, and up to ${fmt(m.longWait[0],1)} days.`;
+}
+
+/* ---------- exhibit 7 ---------- */
+function ex7(){
+  const d=cur().disp, el=$("#ex7 [data-c]");
+  const tot=Object.values(d).reduce((a,b)=>a+b,0);
+  const arr=Object.entries(d).sort((a,b)=>b[1]-a[1]);
+  const items=arr.map(([k,v],i)=>({label:k,value:S.disp==="count"?v:v/tot,vlabel:S.disp==="count"?fmt(v):pct(v/tot,1),color:i===0?"var(--accent)":k==="Not dispositioned"||k==="Carrier-level rejection"?"var(--red)":"var(--serieNavy)",tip:`${k}: ${fmt(v)} (${pct(v/tot,1)})`}));
+  hbars(el,items,{rowH:24,labelW:Math.min(220,W(el)*0.46),valW:58});
+  $("#ex7 [data-t]").textContent=`${arr[0][0][0].toUpperCase()+arr[0][0].slice(1)} was the leading disposition in ${PL()}, at ${pct(arr[0][1]/tot)} of tagged calls.`;
+  const nd=d["Not dispositioned"]||0;
+  $("#ex7 [data-x]").textContent = nd/tot>0.1 ? `${pct(nd/tot)} of calls were not dispositioned, reflecting a set-up error corrected after August.` : "";
+}
+
+/* ---------- exhibit 8 ---------- */
+const SG=[["Available (Ready)","var(--teal)"],["Call work","var(--serieNavy)"],["Training","var(--accent)"],["Lunch and breaks","var(--soft)"],["Meetings and consultation","var(--warm)"],["System and other","var(--line)"]];
+function ex8(){
+  const el=$("#ex8 [data-c]"), w=W(el), lw=40, rh=48; let g="";
+  $("#ex8 [data-l]").innerHTML=SG.map(([k,c])=>`<span><i style="background:${c}"></i>${k}</span>`).join("")+`<span><i style="background:repeating-linear-gradient(135deg,var(--warm) 0 2px,transparent 2px 4px)"></i>Not reported</span>`;
+  g+=`<defs><pattern id="hatch" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="5" style="stroke:var(--warm);stroke-width:1.5"/></pattern></defs>`;
+  avail.forEach((i,k)=>{
+    const st=D[i].status, y=k*rh+4, bh=26, bw=w-lw; let x=lw, sum=0;
+    g+=t(0,y+bh/2+4,SHORT[i],{w:SEL(i)?600:400,c:SEL(i)?"var(--ink)":"var(--muted)",mono:1});
+    SG.forEach(([key,c])=>{const v=st[key]||0; if(!v) return; const ww=bw*v; sum+=v;
+      g+=r(x,y,ww,bh,c,`${D[i].month} — ${key}: ${pct(v,1)}`, SEL(i)?"":`opacity="0.5"`);
+      if(ww>30) g+=t(x+ww/2,y+bh/2+4,pct(v),{a:"middle",size:11,mono:1,c:key==="Call work"?"var(--card)":"#0b1320"});
+      x+=ww;});
+    if(sum<0.98){const ww=bw*(1-sum); g+=`<rect x="${x}" y="${y}" width="${ww}" height="${bh}" fill="url(#hatch)" data-tip="${esc(D[i].month+": "+pct(1-sum)+" of status time not reported (Ready omitted)")}"/>`; g+=t(x+ww/2,y+bh/2+4,`${pct(1-sum)} not reported`,{a:"middle",size:11,c:"var(--ink)",w:600});}
+  });
+  el.innerHTML=svg(w,avail.length*rh,g);
+  const st=cur().status;
+  $("#ex8 [data-t]").textContent = st["Available (Ready)"] ? `Agents were available ${pct(st["Available (Ready)"])} of recorded time in ${PL()} and spent ${pct(st["Call work"])} on call work.` : `${PL()} status data omits Ready time; call work rose to ${pct(st["Call work"])} of recorded time as training fell to ${pct(st["Training"],1)}.`;
+}
+
+/* ---------- exhibit 9 ---------- */
+function ex9(){
+  const m=cur(),p=prev(), el=$("#ex9 [data-c]");
+  const K=[["web","Web intakes"],["email","Information emails"],["walkin","Walk-ins"],["aps","APS referrals"],["uniteus","UniteUs referrals"],["mac","MAC referrals"]];
+  el.innerHTML=K.map(([k,lab])=>{
+    const vals=D.map(x=>x.has?x[k]:null), mx=Math.max(...vals.filter(v=>v!=null))||1, w=120,h=32,bw=w/12;
+    let bars=""; vals.forEach((v,i)=>{ bars+= v==null ? `<rect x="${i*bw+1}" y="${h-2}" width="${bw-2}" height="2" style="fill:var(--track)"/>` : `<rect x="${i*bw+1}" y="${h-h*v/mx}" width="${bw-2}" height="${h*v/mx}" style="fill:${SEL(i)?"var(--accent)":"var(--serieNavy)"}" data-tip="${esc(D[i].month+": "+fmt(v))}"/>`});
+    return `<div class="tile"><div class="t">${lab}</div><div class="n">${fmt(m[k])}</div><div class="d">${p?delta(m[k],p[k],true,"pct")+` <span class="neu">vs ${PPS()}</span>`:`<span class="neu">FY27 baseline</span>`}</div><svg width="${w}" height="${h}" style="max-width:100%">${bars}</svg></div>`;
+  }).join("");
+  const refs=m.aps+m.uniteus+m.mac, lead=[["APS",m.aps],["UniteUs",m.uniteus],["MAC",m.mac]].sort((a,b)=>b[1]-a[1])[0][0];
+  $("#ex9 [data-t]").textContent = p ? `Web intakes ${dirWord(m.web,p.web)} ${pct(Math.abs(chg(m.web,p.web)),1)} to ${fmt(m.web)} in ${PL()}; outbound referrals reached ${fmt(refs)}, led by ${lead}.` : `The ADRC received ${fmt(m.web)} web intakes in ${PL()} and made ${fmt(refs)} APS, UniteUs and MAC referrals.`;
+}
+
+/* ---------- exhibit 10 ---------- */
+const SM={interactions:"Interactions serviced per month",perDay:"Interactions serviced per day",aht:"Average handle time, minutes",triage:"Triages per month"};
+function ex10(){
+  const m=cur(), el=$("#ex10 [data-c]"), key=S.sMetric;
+  let list=m.staffDetail.filter(s=>S.sTeam==="All"||s.team===S.sTeam);
+  if(key==="triage") list=list.filter(s=>s.triage!=null);
+  if(key==="aht") list=list.filter(s=>s.interactions>0);
+  list=[...list].sort((a,b)=>(b[key]||0)-(a[key]||0));
+  const av=mean(list.map(s=>s[key]||0));
+  const items=list.map(s=>({label:s.name,value:s[key]||0,vlabel:key==="aht"?fmt(s[key],1):fmt(s[key]),color:TCOL[s.team],dim:!s.interactions,tip:`${s.name} (${s.team}) — ${fmt(s.interactions)} interactions, ${fmt(s.perDay)}/day, AHT ${fmt(s.aht,1)} min${s.triage!=null?`, ${fmt(s.triage)} triages`:""}`}));
+  hbars(el,items,{rowH:23,labelW:110,valW:50,ref:av,refLabel:`Average ${key==="aht"?fmt(av,1):fmt(av,key==="perDay"?1:0)}`});
+  $("#ex10 [data-u]").textContent=`${SM[key]} by Staff Member`;
+  $("#ex10 [data-k]").innerHTML=`${PL()} &nbsp; ${["I&R","EDWP","HCBS","Special Projects","BRI"].map(tm=>`<span style="white-space:nowrap;margin-right:10px"><i style="display:inline-block;width:9px;height:9px;background:${TCOL[tm]};margin:0 5px 0 4px"></i>${tm.replace("&","&amp;")}</span>`).join("")}`;
+  const nz=list.filter(s=>(s[key]||0)>0).map(s=>s[key]);
+  const scope=S.sTeam==="All"?"across ADRC staff":`within ${S.sTeam}`;
+  $("#ex10 [data-t]").textContent = nz.length ? `${SM[key].replace(/,.*/,"")} ranged from ${fmt(Math.min(...nz),key==="aht"?1:0)} to ${fmt(Math.max(...nz),key==="aht"?1:0)} ${scope} in ${PL()}.` : `No ${SM[key].toLowerCase()} recorded ${scope} in ${PL()}.`;
+}
+
+/* ---------- exhibit 11 ---------- */
+function ex11(){
+  const m=cur(), el=$("#ex11 [data-c]"), o=m.options||{}, na=`<span class="na">Not entered</span>`, c=v=>v==null?na:fmt(v), pv=prev();
+  const p28=m.rs.reduce((a,s)=>a+(s.p28||0),0), upd=m.rs.reduce((a,s)=>a+(s.updated||0),0);
+  el.innerHTML=`<div><div class="sub-h">Resource specialists</div><div class="tblwrap"><table><thead><tr><th>Specialist</th><th class="r">ePRO updated</th><th class="r">New records</th><th class="r">P28 calls</th><th class="r">P28 / day</th></tr></thead><tbody>${m.rs.map(s=>`<tr><td>${esc(s.name)}</td><td class="r">${c(s.updated)}</td><td class="r">${c(s.added)}</td><td class="r">${s.p28==null?"n/a":fmt(s.p28)}</td><td class="r">${s.p28Daily==null?"n/a":fmt(s.p28Daily)}</td></tr>`).join("")}<tr class="grp"><td>Total</td><td class="r">${upd?fmt(upd):"—"}</td><td class="r">${upd?fmt(m.rs.reduce((a,s)=>a+(s.added||0),0)):"—"}</td><td class="r">${fmt(p28)}</td><td></td></tr></tbody></table></div></div>
+  <div><div class="sub-h">Transitions and options counseling</div><div class="tblwrap"><table><thead><tr><th>Activity</th><th class="r">${PS()}</th>${pv?`<th class="r">${PPS()}</th>`:""}</tr></thead><tbody>${[["referrals","Referrals received"],["outreach","Outreach contacts"],["mfp","Money Follows the Person"],["nht","Nursing home transitions"],["transfers","Transfers"]].map(([k,l])=>`<tr><td>${l}</td><td class="r">${c(o[k])}</td>${pv?`<td class="r">${c((pv.options||{})[k])}</td>`:""}</tr>`).join("")}</tbody></table></div></div>`;
+  if(m.epro) el.querySelector("div").insertAdjacentHTML("beforeend",`<p class="src" style="font-style:normal">ePRO updating compliance: <b>${fmt(m.epro.current)} of ${fmt(m.epro.total)} records current (${pct(m.epro.current/m.epro.total,1)})</b>.</p>`);
+  $("#ex11 [data-t]").textContent = upd ? `Resource specialists updated ${fmt(upd)} ePRO records and processed ${fmt(p28)} P28 calls in ${PL()}.` : `Resource specialists processed ${fmt(p28)} P28 calls in ${PL()}; ePRO record and transitions counts are pending entry.`;
+}
+
+
+/* ================= NEW EXHIBITS ================= */
+function legend(el,series){el.innerHTML=series.map(s=>`<span><i style="background:${s.color}${s.dash?";height:2px;vertical-align:3px":""}"></i>${s.label}</span>`).join("")}
+function lineChart(el,series,o={}){
+  const w=W(el), h=o.h||240, top=22, bot=28, lpad=42, rpad=16;
+  const all=series.flatMap(s=>s.vals.filter(v=>v!=null));
+  const yMin=o.yMin??0; let yMax=o.yMax;
+  if(yMax==null){const raw=Math.max(...all,o.target||0)*1.1/4, e=Math.pow(10,Math.floor(Math.log10(raw))), st=[1,2,2.5,5,10].map(k=>k*e).find(k=>k>=raw); yMax=st*4;}
+  const x=i=>lpad+i*(w-lpad-rpad)/11, y=v=>top+(h-top-bot)*(1-(v-yMin)/(yMax-yMin));
+  const f=o.f||(v=>fmt(v));
+  let g="";
+  const NT=o.ticks||4; for(let k=0;k<=NT;k++){const v=yMin+(yMax-yMin)*k/NT, yy=y(v); g+=ln(lpad,yy,w-rpad,yy,"var(--grid)"); g+=t(lpad-6,yy+4,(o.tf||f)(v),{a:"end",size:10,mono:1,c:"var(--muted)"});}
+  g+=ln(lpad,h-bot,w-rpad,h-bot,"var(--slate)");
+  SHORT.forEach((s,i)=>g+=t(x(i),h-bot+18,s,{a:"middle",size:11,mono:1,c:SEL(i)?"var(--ink)":D[i].has?"var(--muted)":"var(--warm)",w:SEL(i)?600:400}));
+  g+=marker(x,top,h,bot);
+  if(o.target!=null){const yy=y(o.target); g+=ln(lpad,yy,w-rpad,yy,"var(--red)",1.5,"5 4")+t(w-rpad,yy-5,o.targetLabel||"Target",{a:"end",size:10,mono:1,c:"var(--red)"});}
+  const lab=[];
+  series.forEach(s=>{
+    const pts=s.vals.map((v,i)=>v==null?null:[x(i),y(v),v,i]).filter(Boolean);
+    if(pts.length>1) g+=`<polyline points="${pts.map(p=>p[0]+","+p[1]).join(" ")}" style="fill:none;stroke:${s.color};stroke-width:2.2"/>`;
+    pts.forEach(p=>{g+=`<circle cx="${p[0]}" cy="${p[1]}" r="${SEL(p[3])?5:3.5}" style="fill:${s.color};stroke:var(--card);stroke-width:1.5" data-tip="${esc(D[p[3]].month+" · "+s.label+": "+f(p[2]))}"/>`; if(p[3]===END()) lab.push([p[0],p[1],f(p[2]),s.color]);});
+  });
+  lab.sort((a,b)=>a[1]-b[1]); let last=-99;
+  lab.forEach(l=>{let yy=Math.max(l[1]+4,last+13); last=yy; g+=t(l[0]+9,yy,l[2],{size:11,mono:1,w:600,c:"var(--ink)"});});
+  el.innerHTML=svg(w,h,g);
+}
+const MV=k=>D.map(m=>m.has?k(m):null);
+
+function exMT(){
+  const el=$("#exMT [data-c]"), ids=UPTO();
+  const sum=f=>ids.reduce((a,i)=>a+(f(D[i])||0),0), avg=f=>mean(ids.map(i=>f(D[i])));
+  const allTri=m=>m.triage.reduce((a,b)=>a+(b||0),0), allDon=m=>m.hcbsDonr.reduce((a,b)=>a+(b||0),0);
+  const G=[
+   ["Volume",[
+    ["Calls serviced (reported)",m=>m.callsServiced,v=>fmt(v),"sum"],
+    ["All serviced interactions",m=>m.funnel.totalAll,v=>fmt(v),"sum"],
+    ["BRI, RS and transfer queues excluded",m=>m.funnel.subtract,v=>fmt(v),"sum"]]],
+   ["Callbacks",[
+    ["Selected by caller",m=>m.funnel.selected,v=>fmt(v),"sum"],
+    ["Scheduled by caller",m=>m.funnel.scheduled,v=>fmt(v),"sum"],
+    ["Serviced",m=>m.funnel.serviced,v=>fmt(v),"sum"],
+    ["Service rate (serviced ÷ scheduled)",m=>m.funnel.serviced/m.funnel.scheduled,v=>pct(v,1),"ratio",[m=>m.funnel.serviced,m=>m.funnel.scheduled]],
+    ["Still in callback list",m=>m.funnel.stillInList,v=>fmt(v),"last"],
+    ["Average wait, days",m=>m.avgWait[0],v=>fmt(v,1),"avg"],
+    ["Longest wait, days",m=>m.longWait[0],v=>fmt(v,1),"max"]]],
+   ["Handle time, minutes",[
+    ["Callbacks",m=>m.aht.callback,v=>fmt(v,1),"avg"],
+    ["Voicemail",m=>m.aht.vm,v=>fmt(v,1),"avg"],
+    ["Outbound",m=>m.aht.out,v=>fmt(v,1),"avg"],
+    ["Team average (I&R, EDWP, HCBS)",m=>mean(m.teamAht),v=>fmt(v,1),"avg"]]],
+   ["Quality and productivity",[
+    ["Team utilization, average",m=>mean(m.util),v=>pct(v,1),"avg"],
+    ["Post-call satisfaction",m=>m.survey,v=>pct(v,1),"avg"],
+    ["MDE accuracy, average",m=>mean(m.mde),v=>pct(v,1),"avg"],
+    ["Staff FTE, all teams",m=>m.staff.reduce((a,b)=>a+b,0),v=>fmt(v,1),"avg"]]],
+   ["Intake and referrals",[
+    ["Web intakes",m=>m.web,v=>fmt(v),"sum"],["Information emails",m=>m.email,v=>fmt(v),"sum"],["Walk-ins",m=>m.walkin,v=>fmt(v),"sum"],
+    ["APS referrals",m=>m.aps,v=>fmt(v),"sum"],["UniteUs referrals",m=>m.uniteus,v=>fmt(v),"sum"],["MAC referrals",m=>m.mac,v=>fmt(v),"sum"]]],
+   ["Assessments and specialized programs",[
+    ["Triages, all teams",allTri,v=>fmt(v),"sum"],["HCBS DON-Rs, all teams",allDon,v=>fmt(v),"sum"],
+    ["CCSP DON-Rs, staff-reported",m=>m.staffDetail.reduce((a,s)=>a+(s.ccsp||0),0),v=>fmt(v),"sum"],
+    ["P28 calls processed",m=>m.rs.reduce((a,s)=>a+(s.p28||0),0),v=>fmt(v),"sum"],
+    ["ePRO updating compliance",m=>m.epro?m.epro.current/m.epro.total:null,v=>pct(v,1),"last"],
+    ["UniteUs referrals by Special Projects",m=>{const u=m.staffDetail.filter(s=>s.uniteus!=null);return u.length?u.reduce((a,s)=>a+s.uniteus,0):null},v=>v==null?"—":fmt(v),"sum"]]],
+   ["BRI program",[
+    ["New cases",m=>m.bri?.new,v=>fmt(v),"sum"],["Discharged cases",m=>m.bri?.dc,v=>fmt(v),"sum"],
+    ["Total clients served",m=>m.bri?.served,v=>fmt(v),"last"],["Enrollments",m=>m.staffDetail.filter(s=>s.team==="BRI").reduce((a,s)=>a+(s.enroll||0),0),v=>fmt(v),"sum"]]],
+  ];
+  let h=`<thead><tr><th>Measure</th>${SHORT.map((s,i)=>`<th class="r ${SEL(i)?"sel":""} ${D[i].has?"":"pend"}">${s}</th>`).join("")}<th class="r sel">YTD thru ${SHORT[END()]}</th></tr></thead><tbody>`;
+  G.forEach(([gname,rows])=>{h+=`<tr class="grp"><td colspan="14">${gname.replace("&","&amp;")}</td></tr>`;
+    rows.forEach(([lab,f,fm,agg,rat])=>{
+      const y = agg==="sum"?sum(f):agg==="avg"?avg(f):agg==="last"?f(D[END()]):agg==="max"?Math.max(...ids.map(i=>f(D[i]))):sum(rat[0])/sum(rat[1]);
+      h+=`<tr><td>${lab}</td>${SHORT.map((s,i)=>`<td class="r ${SEL(i)?"sel":""} ${D[i].has?"":"pend"}">${D[i].has?fm(f(D[i])):"—"}</td>`).join("")}<td class="r sel ytd">${fm(y)}</td></tr>`;});
+  });
+  el.innerHTML=h+"</tbody>";
+  const tot=sum(m=>m.callsServiced);
+  $("#exMT [data-t]").textContent=`Through ${LONG[END()]}, the ADRC has serviced ${fmt(tot)} calls and ${fmt(sum(m=>m.funnel.serviced))} callbacks, received ${fmt(sum(m=>m.web))} web intakes and completed ${fmt(sum(allTri))} triages in FY2027.`;
+}
+
+function exCT(){
+  const S1=[{label:"Scheduling rate",color:"var(--soft)",vals:MV(m=>m.funnel.scheduled/m.funnel.selected)},
+            {label:"Acceptance rate",color:"var(--serieNavy)",vals:MV(m=>m.funnel.accepted/m.funnel.scheduled)},
+            {label:"Service rate",color:"var(--accent)",vals:MV(m=>m.funnel.serviced/m.funnel.scheduled)}];
+  legend($("#exCT [data-l]"),S1);
+  lineChart($("#exCT [data-c]"),S1,{yMin:0,yMax:0.8,f:v=>pct(v,1),tf:v=>pct(v)});
+  const m=cur(),p=prev(), sr=m.funnel.serviced/m.funnel.scheduled;
+  $("#exCT [data-t]").textContent = p ? `The callback service rate ${dirWord(sr,p.funnel.serviced/p.funnel.scheduled,"improved","declined")} to ${pct(sr,1)} in ${PL()} (${delta(sr,p.funnel.serviced/p.funnel.scheduled,true,"pp").replace(/<[^>]+>/g,"")} from ${PPL()}), while ${pct(m.funnel.scheduled/m.funnel.selected)} of callers who selected a callback completed scheduling.` : `${pct(sr,1)} of caller-scheduled callbacks were serviced in ${PL()}.`;
+}
+function exHT(){
+  const S1=[{label:"Callbacks",color:"var(--accent)",vals:MV(m=>m.aht.callback)},{label:"Outbound",color:"var(--serieNavy)",vals:MV(m=>m.aht.out)},{label:"Voicemail",color:"var(--teal)",vals:MV(m=>m.aht.vm)}];
+  legend($("#exHT [data-l]"),S1);
+  lineChart($("#exHT [data-c]"),S1,{yMin:0,yMax:30,f:v=>fmt(v,1),tf:v=>fmt(v)});
+  const m=D[END()],f=D[avail[0]];
+  $("#exHT [data-t]").textContent = END()>avail[0] ? `Since July, callback handle time ${dirWord(m.aht.callback,f.aht.callback,"lengthened","shortened")} by ${fmt(Math.abs(m.aht.callback-f.aht.callback),1)} minutes, while voicemail handle time ${dirWord(m.aht.vm,f.aht.vm,"rose","fell")} by ${fmt(Math.abs(m.aht.vm-f.aht.vm),1)} minutes.` : `Callbacks carried the longest handle time in ${PL()}, at ${fmt(m.aht.callback,1)} minutes.`;
+}
+function exDT(){
+  const el=$("#exDT [data-c]"), ids=avail, m=cur(), p=prev();
+  const tot=o=>Object.values(o.disp).reduce((a,b)=>a+b,0);
+  const tots=ids.map(i=>tot(D[i])), ct=tot(m), pt=p?tot(p):null;
+  const cats=[...new Set(ids.flatMap(i=>Object.keys(D[i].disp)))].sort((a,b)=>(m.disp[b]||0)-(m.disp[a]||0));
+  const per=!isM();
+  let h=`<thead><tr><th>Disposition</th>${ids.map(i=>`<th class="r ${SEL(i)?"sel":""}">${SHORT[i]} count</th><th class="r ${SEL(i)?"sel":""}">${SHORT[i]} share</th>`).join("")}${per?`<th class="r sel">${PS()} count</th><th class="r sel">${PS()} share</th>`:""}<th class="r">Share change vs ${p?PPS():"prior"}</th></tr></thead><tbody>`;
+  let big=null;
+  cats.forEach(c=>{
+    const cs=(m.disp[c]||0)/ct, ps=p?(p.disp[c]||0)/pt:null, dpp=p?cs-ps:null;
+    if(dpp!=null&&c!=="Not dispositioned"&&(!big||Math.abs(dpp)>Math.abs(big[1]))) big=[c,dpp];
+    h+=`<tr><td>${c}</td>${ids.map((i,k)=>`<td class="r ${SEL(i)?"sel":""}">${D[i].disp[c]?fmt(D[i].disp[c]):"—"}</td><td class="r ${SEL(i)?"sel":""}">${pct((D[i].disp[c]||0)/tots[k],1)}</td>`).join("")}${per?`<td class="r sel">${fmt(m.disp[c]||0)}</td><td class="r sel">${pct(cs,1)}</td>`:""}<td class="r">${dpp==null?"—":`<span class="mono" style="color:var(--slate)">${dpp>0?"+":dpp<0?"−":""}${fmt(Math.abs(dpp*100),1)} pts</span>`}</td></tr>`;
+  });
+  h+=`<tr class="grp"><td>Total tagged</td>${ids.map((i,k)=>`<td class="r">${fmt(tots[k])}</td><td class="r">100%</td>`).join("")}${per?`<td class="r">${fmt(ct)}</td><td class="r">100%</td>`:""}<td></td></tr>`;
+  el.innerHTML=h+"</tbody>";
+  $("#exDT [data-t]").textContent = big ? `Excluding the not-dispositioned category, the largest shift in ${PL()} was ${big[0]}, ${big[1]>0?"up":"down"} ${fmt(Math.abs(big[1]*100),1)} percentage points of tagged calls from ${PPL()}.` : `${PL()} has no prior period for comparison; disposition shares establish the FY2027 baseline.`;
+}
+function exUT(){
+  const S1=TEAMS.map((tm,k)=>({label:tm,color:TCOL[tm],vals:MV(m=>m.util[k])})).concat([{label:"80% target",color:"var(--red)",dash:1,vals:Array(12).fill(null)}]);
+  legend($("#exUT [data-l]"),S1);
+  lineChart($("#exUT [data-c]"),S1.slice(0,3),{yMin:0.70,yMax:0.95,ticks:5,target:0.8,targetLabel:"Target 80%",f:v=>pct(v,1),tf:v=>pct(v)});
+  const ids=UPTO(), mins=TEAMS.map((tm,k)=>Math.min(...ids.map(i=>D[i].util[k])));
+  $("#exUT [data-t]").textContent=`Every team has stayed above the 80% target in each reported month; the lowest monthly figure to date is ${pct(Math.min(...mins),1)} (${TEAMS[mins.indexOf(Math.min(...mins))]}).`;
+}
+function exHA(){
+  const el=$("#exHA [data-c]"), w=W(el), h=240, top=24, bot=28;
+  const tri=MV(m=>m.triage.reduce((a,b)=>a+(b||0),0)), don=MV(m=>m.hcbsDonr.reduce((a,b)=>a+(b||0),0));
+  const mx=Math.max(...tri.filter(v=>v!=null))*1.15, bw=w/12, b=Math.min(18,bw*0.32);
+  let g=""; [0.25,0.5,0.75,1].forEach(f=>{const yy=h-bot-(h-top-bot)*f;g+=ln(0,yy,w,yy,"var(--grid)")});
+  g+=ln(0,h-bot,w,h-bot,"var(--slate)");
+  D.forEach((m,i)=>{const cx=bw*i+bw/2;
+    if(m.has){[[tri[i],"var(--serieNavy)","Triages",-b-1],[don[i],"var(--accent)","HCBS DON-Rs",1]].forEach(([v,c,l,dx])=>{const bh=(h-top-bot)*v/mx;
+      g+=r(cx+dx,h-bot-bh,b,bh,c,`${m.month} · ${l}: ${fmt(v)}`,SEL(i)?"":`opacity="0.55"`); g+=t(cx+dx+b/2,h-bot-bh-5,fmt(v),{a:"middle",size:10,mono:1,c:"var(--ink)"})});}
+    else g+=`<rect x="${cx-b}" y="${h-bot-14}" width="${2*b}" height="14" style="fill:none;stroke:var(--warm);stroke-dasharray:3 3"/>`;
+    g+=t(cx,h-bot+18,SHORT[i],{a:"middle",size:11,mono:1,c:SEL(i)?"var(--ink)":"var(--muted)",w:SEL(i)?600:400});});
+  el.innerHTML=svg(w,h,g);
+  const m=cur(), p=prev(), T=m.triage.reduce((a,b)=>a+(b||0),0), Dn=m.hcbsDonr.reduce((a,b)=>a+(b||0),0), ids=UPTO(), PT=p?p.triage.reduce((a,b)=>a+(b||0),0):null;
+  $("#exHA [data-o]").innerHTML=`<div><b>${fmt(T)}</b>Triages</div><div><b>${fmt(Dn)}</b>HCBS DON-Rs</div><div><b>${pct(Dn/T)}</b>DON-Rs per triage</div><div><b>${fmt(m.staffDetail.reduce((a,s)=>a+(s.ccsp||0),0))}</b>CCSP DON-Rs</div><div><b>${fmt(ids.reduce((a,i)=>a+tri[i],0))}</b>Triages YTD</div>`;
+  $("#exHA [data-t]").textContent = p ? `Triage volume ${dirWord(T,PT)} ${pct(Math.abs(chg(T,PT)))} to ${fmt(T)} in ${PL()}, with ${fmt(Dn)} HCBS DON-Rs, about ${fmt(Dn/T*100)} for every 100 triages.` : `The ADRC completed ${fmt(T)} triages and ${fmt(Dn)} HCBS DON-Rs in ${PL()}.`;
+}
+function exSC(){
+  const el=$("#exSC [data-c]"), w=W(el), h=320, top=16, bot=36, lpad=40, rpad=16;
+  const list=cur().staffDetail.filter(s=>(S.sTeam==="All"||s.team===S.sTeam)&&s.interactions>0&&s.aht!=null);
+  if(!list.length){el.innerHTML=`<p class="na">No staff with recorded interactions for this filter.</p>`;$("#exSC [data-t]").textContent="";return}
+  const xs=list.map(s=>s.interactions), ys=list.map(s=>s.aht);
+  const xMax=Math.max(...xs)*1.1, yMin=Math.floor(Math.min(...ys)-2), yMax=Math.ceil(Math.max(...ys)+2);
+  const X=v=>lpad+(w-lpad-rpad)*v/xMax, Y=v=>top+(h-top-bot)*(1-(v-yMin)/(yMax-yMin));
+  let g="";
+  for(let k=0;k<=4;k++){const v=yMin+(yMax-yMin)*k/4;g+=ln(lpad,Y(v),w-rpad,Y(v),"var(--grid)")+t(lpad-6,Y(v)+4,fmt(v),{a:"end",size:10,mono:1,c:"var(--muted)"});
+    const xv=xMax*k/4;g+=t(X(xv),h-bot+16,fmt(xv),{a:"middle",size:10,mono:1,c:"var(--muted)"});}
+  g+=ln(lpad,h-bot,w-rpad,h-bot,"var(--slate)");
+  g+=t((lpad+w)/2,h-4,"Interactions serviced per month",{a:"middle",size:11,c:"var(--muted)"});
+  g+=t(lpad,top-4,"Minutes",{size:10,c:"var(--muted)"});
+  const ax=mean(xs), ay=mean(ys);
+  g+=ln(X(ax),top,X(ax),h-bot,"var(--red)",1.2,"4 3")+ln(lpad,Y(ay),w-rpad,Y(ay),"var(--red)",1.2,"4 3");
+  g+=t(w-rpad,top+10,"Higher volume, longer calls",{a:"end",size:10,c:"var(--muted)"})+t(w-rpad,h-bot-6,"Higher volume, shorter calls",{a:"end",size:10,c:"var(--muted)"});
+  list.forEach(s=>{g+=`<circle cx="${X(s.interactions)}" cy="${Y(s.aht)}" r="6" style="fill:${TCOL[s.team]};stroke:var(--card);stroke-width:1.5;opacity:.9" data-tip="${esc(`${s.name} (${s.team}) — ${fmt(s.interactions)} interactions, AHT ${fmt(s.aht,1)} min`)}"/>`;});
+  const ext=[...list].sort((a,b)=>b.interactions-a.interactions).slice(0,1).concat([...list].sort((a,b)=>b.aht-a.aht).slice(0,1));
+  ext.filter((v,k,a)=>a.indexOf(v)===k).forEach(s=>g+=t(X(s.interactions)-8,Y(s.aht)-9,s.name,{a:"end",size:10.5,c:"var(--ink)",w:500}));
+  el.innerHTML=svg(w,h,g);
+  const fast=list.filter(s=>s.interactions>=ax&&s.aht<=ay).length;
+  $("#exSC [data-t]").textContent=`${fast} of ${list.length} staff shown handled above-average volume with below-average handle time in ${PL()}; averages were ${fmt(ax)} interactions and ${fmt(ay,1)} minutes.`;
+}
+function exST(){
+  const el=$("#exST [data-c]"), ids=avail, m=cur(), p=prev();
+  const names=m.staffDetail.filter(s=>S.sTeam==="All"||s.team===S.sTeam);
+  const get=(o,n)=>{const r=o.staffDetail.find(s=>s.name===n);return r?r.interactions:null};
+  const rows=names.map(s=>({n:s.name,team:s.team,v:ids.map(i=>get(D[i],s.name))})).sort((a,b)=>(get(m,b.n)||0)-(get(m,a.n)||0));
+  const per=!isM();
+  el.innerHTML=`<thead><tr><th>Staff</th><th>Team</th>${ids.map(i=>`<th class="r ${SEL(i)?"sel":""}">${SHORT[i]}</th>`).join("")}${per?`<th class="r sel">${PS()}</th>`:""}<th class="r">Change</th><th class="r">Trend</th></tr></thead><tbody>`+
+    rows.map(r=>{const c=get(m,r.n), pv=p?get(p,r.n):null;
+      return `<tr><td>${esc(r.n)}</td><td><span style="display:inline-block;width:8px;height:8px;background:${TCOL[r.team]};margin-right:6px"></span>${r.team.replace("&","&amp;")}</td>${r.v.map((v,k)=>`<td class="r ${SEL(ids[k])?"sel":""}">${fmt(v)}</td>`).join("")}${per?`<td class="r sel"><b>${fmt(c)}</b></td>`:""}<td class="r">${pv?delta(c,pv,true,"pct"):"—"}</td><td class="r">${spark(r.v.slice(0,ids.indexOf(END())+1).map(v=>v||0))}</td></tr>`}).join("")+"</tbody>";
+  const tot=rows.reduce((a,r)=>a+(get(m,r.n)||0),0), ptot=p?rows.reduce((a,r)=>a+(get(p,r.n)||0),0):null;
+  const up=p?rows.filter(r=>(get(m,r.n)||0)>(get(p,r.n)||0)).length:0;
+  $("#exST [data-t]").textContent = p ? `${up} of ${rows.length} staff shown increased their interactions in ${PL()}; combined volume ${dirWord(tot,ptot)} ${pct(Math.abs(chg(tot,ptot)),1)} to ${fmt(tot)}.` : `Staff shown serviced ${fmt(tot)} interactions in ${PL()}.`;
+}
+function exRF(){
+  const S1=[{label:"UniteUs",color:"var(--teal)",vals:MV(m=>m.uniteus)},{label:"APS",color:"var(--serieNavy)",vals:MV(m=>m.aps)},{label:"MAC",color:"var(--accent)",vals:MV(m=>m.mac)}];
+  legend($("#exRF [data-l]"),S1); lineChart($("#exRF [data-c]"),S1);
+  const m=D[END()], f=D[avail[0]];
+  $("#exRF [data-t]").textContent = END()>avail[0] ? `APS referrals ${dirWord(m.aps,f.aps)} ${pct(Math.abs(chg(m.aps,f.aps)))} and UniteUs referrals ${dirWord(m.uniteus,f.uniteus)} ${pct(Math.abs(chg(m.uniteus,f.uniteus)))} between July and ${LONG[END()]}.` : `UniteUs and APS account for most outbound referrals in ${PL()}.`;
+}
+function exRS(){
+  const S1=[{label:"P28 calls processed",color:"var(--serieNavy)",vals:MV(m=>m.rs.reduce((a,s)=>a+(s.p28||0),0))},{label:"ePRO records updated",color:"var(--accent)",vals:MV(m=>{const u=m.rs.map(s=>s.updated).filter(v=>v!=null);return u.length?u.reduce((a,b)=>a+b,0):null})}];
+  legend($("#exRS [data-l]"),S1); lineChart($("#exRS [data-c]"),S1);
+  const m=cur(), p=prev(), P=o=>o.rs.reduce((a,s)=>a+(s.p28||0),0), U=m.rs.some(s=>s.updated!=null);
+  $("#exRS [data-t]").textContent = p ? `P28 calls processed ${dirWord(P(m),P(p))} ${pct(Math.abs(chg(P(m),P(p))))} to ${fmt(P(m))} in ${PL()}${U?"":"; ePRO update counts are pending entry"}.` : `Resource specialists processed ${fmt(P(m))} P28 calls in ${PL()}${S1[1].vals[END()]==null?"; September ePRO counts are pending entry":""}.`;
+}
+
+
+/* ================= PERIOD-AWARE NEW VIEWS ================= */
+function harvey(f){
+  const c="var(--serieNavy)";let inner="";
+  if(f>=1)inner=`<circle cx="9" cy="9" r="8" style="fill:${c}"/>`;
+  else if(f>0){const a=2*Math.PI*f,x=9+8*Math.sin(a),y=9-8*Math.cos(a);inner=`<path d="M9 9 L9 1 A8 8 0 ${f>.5?1:0} 1 ${x.toFixed(2)} ${y.toFixed(2)} Z" style="fill:${c}"/>`;}
+  return `<svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><circle cx="9" cy="9" r="8" style="fill:none;stroke:${c};stroke-width:1.4"/>${inner}</svg>`;
+}
+document.querySelectorAll(".hv[data-h]").forEach(e=>e.innerHTML=harvey(+e.dataset.h));
+const tag=(k)=>{const c={alert:["var(--red)","Alert"],watch:["var(--accent)","Watch"],good:["var(--teal)","Improving"],met:["var(--teal)","Meets standard"],info:["var(--soft)","Note"]}[k];return `<span class="flagtag" style="border-color:${c[0]}"><i style="background:${c[0]}"></i>${c[1]}</span>`};
+
+/* ---- staff profile ---- */
+function teamAvgFor(o,team){const r=o.staffDetail.filter(s=>s.team===team&&s.interactions>0);return {inter:mean(r.map(s=>s.interactions)),aht:r.filter(s=>s.aht!=null).reduce((a,s)=>a+s.aht*s.interactions,0)/Math.max(1,r.filter(s=>s.aht!=null).reduce((a,s)=>a+s.interactions,0)),n:r.length}}
+function buildStaffSel(){
+  const all=D[avail.at(-1)].staffDetail, sel=$("#staffSel");
+  if(!S.staff) S.staff=[...all].sort((a,b)=>b.interactions-a.interactions)[0].name;
+  const groups=["I&R","EDWP","HCBS","Special Projects","BRI"];
+  sel.innerHTML=groups.map(g=>`<optgroup label="${g.replace("&","&amp;")}">${all.filter(s=>s.team===g).map(s=>`<option ${s.name===S.staff?"selected":""}>${esc(s.name)}</option>`).join("")}</optgroup>`).join("");
+  sel.onchange=()=>{S.staff=sel.value;renderProfile()};
+}
+function renderProfile(){
+  const m=cur(), p=prev(), me=m.staffDetail.find(s=>s.name===S.staff); if(!me) return;
+  const team=me.team, ta=teamAvgFor(m,team), mates=m.staffDetail.filter(s=>s.team===team).sort((a,b)=>b.interactions-a.interactions);
+  const rank=mates.findIndex(s=>s.name===S.staff)+1, share=me.interactions/mates.reduce((a,s)=>a+(s.interactions||0),0);
+  const pm=p?p.staffDetail.find(s=>s.name===S.staff):null;
+  $("#staffTeamLbl").innerHTML=`<i style="background:${TCOL[team]}"></i>${team.replace("&","&amp;")}`;
+  const k=[
+    ["Interactions",fmt(me.interactions),"",pm?`${delta(me.interactions,pm.interactions)} vs ${PPS()}`:`${PL()}`],
+    ["Per day",fmt(me.perDay,isM()?0:1),"",`Team avg ${fmt(mean(mates.filter(s=>s.interactions>0).map(s=>s.perDay)),1)}`],
+    ["Avg handle time",me.aht!=null&&me.interactions?fmt(me.aht,1)+" min":"—",me.aht>ta.aht*1.25?"bad":"",`Team avg ${fmt(ta.aht,1)} min`],
+    ["Rank in team",`${rank} of ${mates.length}`,"",`${pct(share,1)} of team volume`],
+    team==="BRI"?["Enrollments",fmt(me.enroll),"",`BRI team ${fmt(mates.reduce((a,s)=>a+(s.enroll||0),0))} enrollments`]:
+    me.uniteus!=null?["UniteUs referrals",fmt(me.uniteus),"",`${fmt(me.triage)} triages · ${fmt(me.donr)} HCBS DON-Rs`]:
+    [me.triage!=null?"Triages":"vs team average",me.triage!=null?fmt(me.triage):(ta.inter?pct(me.interactions/ta.inter):"—"),"",me.triage!=null?`${fmt(me.donr)} HCBS DON-Rs${me.ccsp?` · ${fmt(me.ccsp)} CCSP`:""}`:`Team avg ${fmt(ta.inter)} interactions`],
+  ];
+  $("#pKpis").innerHTML=k.map(([l,v,c,n])=>`<div class="kpi"><div class="label">${l}</div><div class="val ${c}">${v}</div><div class="note">${n}</div></div>`).join("");
+  const v=MV(o=>{const r=o.staffDetail.find(s=>s.name===S.staff);return r?r.interactions:null}), tv=MV(o=>teamAvgFor(o,team).inter);
+  const a=MV(o=>{const r=o.staffDetail.find(s=>s.name===S.staff);return r&&r.interactions?r.aht:null}), tav=MV(o=>teamAvgFor(o,team).aht);
+  const S1=[{label:S.staff,color:"var(--accent)",vals:v},{label:`${team} average`,color:"var(--serieNavy)",vals:tv}];
+  const S2=[{label:S.staff,color:"var(--accent)",vals:a},{label:`${team} average`,color:"var(--serieNavy)",vals:tav}];
+  legend($("#exPV [data-l]"),S1); lineChart($("#exPV [data-c]"),S1);
+  legend($("#exPA [data-l]"),S2); lineChart($("#exPA [data-c]"),S2,{yMin:0,yMax:40,f:x=>fmt(x,1),tf:x=>fmt(x)});
+  const vr=ta.inter?me.interactions/ta.inter-1:null;
+  $("#exPV [data-t]").textContent = me.interactions ? `${S.staff} serviced ${fmt(me.interactions)} interactions in ${PL()}, ${pct(Math.abs(vr))} ${vr>=0?"above":"below"} the ${team} average of ${fmt(ta.inter)}.` : `${S.staff} has no recorded interactions in ${PL()}.`;
+  $("#exPA [data-t]").textContent = me.interactions&&me.aht!=null ? `Average handle time was ${fmt(me.aht,1)} minutes, ${fmt(Math.abs(me.aht-ta.aht),1)} minutes ${me.aht>=ta.aht?"longer":"shorter"} than the team average.` : `No handle time recorded for ${PL()}.`;
+  const el=$("#exPT [data-c]");
+  el.innerHTML=`<thead><tr><th>Month</th><th class="r">Interactions</th><th class="r">Per day</th><th class="r">Handle time, min</th><th class="r">Triages</th><th class="r">HCBS DON-Rs</th><th class="r">Team avg interactions</th><th class="r">Variance vs team</th><th class="r">Team rank</th></tr></thead><tbody>`+
+    avail.map(i=>{const o=D[i], r=o.staffDetail.find(s=>s.name===S.staff)||{}, t=teamAvgFor(o,team), rk=o.staffDetail.filter(s=>s.team===team).sort((x,y)=>y.interactions-x.interactions).findIndex(s=>s.name===S.staff)+1, vv=t.inter&&r.interactions!=null?r.interactions/t.inter-1:null;
+      return `<tr><td class="${SEL(i)?"sel":""}">${o.month}</td><td class="r ${SEL(i)?"sel":""}">${fmt(r.interactions)}</td><td class="r ${SEL(i)?"sel":""}">${fmt(r.perDay)}</td><td class="r ${SEL(i)?"sel":""}">${r.interactions?fmt(r.aht,1):"—"}</td><td class="r ${SEL(i)?"sel":""}">${r.triage==null?"n/a":fmt(r.triage)}</td><td class="r ${SEL(i)?"sel":""}">${r.donr==null?"n/a":fmt(r.donr)}</td><td class="r ${SEL(i)?"sel":""}">${fmt(t.inter)}</td><td class="r ${SEL(i)?"sel":""}">${vv==null?"—":`<span class="${vv>=0?"good":"bad"}">${vv>=0?"+":"−"}${pct(Math.abs(vv))}</span>`}</td><td class="r ${SEL(i)?"sel":""}">${rk} of ${o.staffDetail.filter(s=>s.team===team).length}</td></tr>`}).join("")+"</tbody>";
+}
+
+/* ---- watch list ---- */
+function flags(){
+  const m=cur(), p=prev(), F=[];
+  const add=(lvl,area,meas,v,pv,ch,rule)=>F.push({lvl,area,meas,v,pv,ch,rule});
+  const c=(a,b)=>p?chg(a,b):null;
+  // volume
+  let d=c(m.callsServiced,p&&p.callsServiced);
+  if(d!=null){ if(d<=-0.10) add("alert","Volume","Calls serviced (reported)",fmt(m.callsServiced),fmt(p.callsServiced),d,"Decline of 10% or more");
+    else if(d<=-0.05) add("watch","Volume","Calls serviced (reported)",fmt(m.callsServiced),fmt(p.callsServiced),d,"Decline of 5–10%");
+    else if(d>=0.05) add("good","Volume","Calls serviced (reported)",fmt(m.callsServiced),fmt(p.callsServiced),d,"Increase of 5% or more");}
+  d=c(m.funnel.stillInList,p&&p.funnel.stillInList);
+  if(d!=null){ if(d>=0.25) add("alert","Callbacks","Callbacks still in list",fmt(m.funnel.stillInList),fmt(p.funnel.stillInList),d,"Backlog up 25% or more");
+    else if(d<=-0.10) add("good","Callbacks","Callbacks still in list",fmt(m.funnel.stillInList),fmt(p.funnel.stillInList),d,"Backlog down 10% or more");}
+  const sr=m.funnel.serviced/m.funnel.scheduled, psr=p?p.funnel.serviced/p.funnel.scheduled:null;
+  if(p&&sr-psr>=0.05) add("good","Callbacks","Service rate (serviced ÷ scheduled)",pct(sr,1),pct(psr,1),null,"Up 5 points or more",`+${fmt((sr-psr)*100,1)} pts`);
+  if(p&&sr-psr<=-0.05) add("alert","Callbacks","Service rate (serviced ÷ scheduled)",pct(sr,1),pct(psr,1),null,"Down 5 points or more",`−${fmt((psr-sr)*100,1)} pts`);
+  if(sr<0.4) add("watch","Callbacks","Service rate (serviced ÷ scheduled)",pct(sr,1),p?pct(psr,1):"—",null,"Below 40% of scheduled callbacks");
+  const sop=m.sopCal[0];
+  if(m.longWait[0]>sop) add("alert","Wait time","Longest callback wait, days",fmt(m.longWait[0],1),p?fmt(p.longWait[0],1):"—",null,`Exceeds SOP of ${fmt(sop)} calendar days`);
+  else if(m.longWait[0]>sop-1) add("watch","Wait time","Longest callback wait, days",fmt(m.longWait[0],1),p?fmt(p.longWait[0],1):"—",null,`Within 1 day of ${fmt(sop)}-day SOP`);
+  if(m.avgWait[0]>sop) add("alert","Wait time","Average callback wait, days",fmt(m.avgWait[0],1),p?fmt(p.avgWait[0],1):"—",null,`Exceeds SOP of ${fmt(sop)} calendar days`);
+  else if(p&&m.avgWait[0]<=p.avgWait[0]*0.8) add("good","Wait time","Average callback wait, days",fmt(m.avgWait[0],1),fmt(p.avgWait[0],1),c(m.avgWait[0],p.avgWait[0]),"Down 20% or more");
+  d=c(m.aht.callback,p&&p.aht.callback);
+  if(d!=null&&d>=0.10) add("alert","Handle time","Callback handle time, min",fmt(m.aht.callback,1),fmt(p.aht.callback,1),d,"Up 10% or more");
+  else if(d!=null&&d>=0.05) add("watch","Handle time","Callback handle time, min",fmt(m.aht.callback,1),fmt(p.aht.callback,1),d,"Up 5–10%");
+  TEAMS.forEach((tm,k)=>{const u=m.util[k],pu=p?p.util[k]:null;
+    if(u<0.8) add("alert","Teams",`${tm} utilization`,pct(u,1),pu!=null?pct(pu,1):"—",null,"Below 80% target");
+    else if(u<0.82) add("watch","Teams",`${tm} utilization`,pct(u,1),pu!=null?pct(pu,1):"—",null,"Within 2 points of 80% target");});
+  if(m.survey<0.95) add("alert","Quality","Post-call satisfaction",pct(m.survey,1),p?pct(p.survey,1):"—",null,"Below 95%");
+  TEAMS.forEach((tm,k)=>{if(m.mde[k]<0.98) add("watch","Quality",`${tm} MDE accuracy`,pct(m.mde[k],1),p?pct(p.mde[k],1):"—",null,"Below 98%");});
+  const tt=Object.values(m.disp).reduce((a,b)=>a+b,0), nd=(m.disp["Not dispositioned"]||0)/tt;
+  if(nd>0.10) add("alert","Data","Not-dispositioned calls",pct(nd,1),"—",null,"More than 10% of tagged calls");
+  else if(nd>0.03) add("watch","Data","Not-dispositioned calls",pct(nd,1),"—",null,"More than 3% of tagged calls");
+  [["web","Web intakes"],["aps","APS referrals"],["uniteus","UniteUs referrals"]].forEach(([k2,l])=>{d=c(m[k2],p&&p[k2]); if(d!=null&&Math.abs(d)>=0.15) add("watch","Demand",l,fmt(m[k2]),fmt(p[k2]),d,"Change of 15% or more; check staffing");});
+  const tr=m.triage.reduce((a,b)=>a+(b||0),0), ptr=p?p.triage.reduce((a,b)=>a+(b||0),0):null; d=c(tr,ptr);
+  if(d!=null&&d>=0.20) add("watch","Assessments","Triages, all teams",fmt(tr),fmt(ptr),d,`Up 20% or more; ${fmt(m.triage[2]/m.staff[2],0)} per HCBS FTE`);
+  if(m.bri&&m.bri.dc>m.bri.new) add("watch","BRI","Discharges exceeded new cases",`${fmt(m.bri.new)} new / ${fmt(m.bri.dc)} D/C`,p&&p.bri?`${fmt(p.bri.new)} / ${fmt(p.bri.dc)}`:"—",null,"Net caseload decline");
+  if(m.epro){const ec=m.epro.current/m.epro.total, pe=p&&p.epro?p.epro.current/p.epro.total:null;
+    if(ec<0.9) add("watch","Resources","ePRO updating compliance",pct(ec,1),pe!=null?pct(pe,1):"—",null,"Below 90% of records current");
+    else if(pe!=null&&ec-pe>=0.01) add("good","Resources","ePRO updating compliance",pct(ec,1),pct(pe,1),null,"Up 1 point or more");}
+  TEAMS.forEach((tm,k)=>{const a=m.teamAht?.[k], pa=p?.teamAht?.[k]; if(a!=null&&pa!=null&&a>=pa*1.15) add("watch","Teams",`${tm} team handle time`,fmt(a,1)+" min",fmt(pa,1)+" min",chg(a,pa),"Up 15% or more");});
+  const miss=DQ.filter(r=>PIDS().some(i=>r.f(D[i])<1)).map(r=>r.l);
+  if(miss.length) add("info","Data","Incomplete data blocks",`${miss.length}`,"—",null,miss.join("; "));
+  return F;
+}
+function renderWatch(){
+  const F=flags(), n=k=>F.filter(f=>f.lvl===k).length;
+  $("#wFind").innerHTML=[["bad",n("alert"),"Alerts requiring action","Measures past a standard or moving sharply in the wrong direction."],["",n("watch"),"Watch items","Measures near a standard or with a notable shift in demand or quality."],["good",n("good"),"Improvements","Favorable movements against the prior period."]]
+    .map(x=>`<div class="find ${x[0]}"><div class="big">${x[1]}</div><h4>${x[2]} · ${PL()}</h4><p>${x[3]}</p></div>`).join("");
+  const order={alert:0,watch:1,info:2,good:3}, show=F.filter(f=>S.wf==="all"||f.lvl===S.wf).sort((a,b)=>order[a.lvl]-order[b.lvl]);
+  $("#exWF [data-c]").innerHTML=`<thead><tr><th>Status</th><th>Area</th><th>Measure</th><th class="r">${PS()}</th><th class="r">${prev()?PPS():"Prior"}</th><th class="r">Change</th><th>Rule</th></tr></thead><tbody>`+
+    (show.length?show.map(f=>`<tr><td>${tag(f.lvl)}</td><td>${f.area}</td><td>${f.meas}</td><td class="r"><b>${f.v}</b></td><td class="r">${f.pv}</td><td class="r">${f.ch!=null?`<span class="mono">${f.ch>0?"+":"−"}${pct(Math.abs(f.ch),1)}</span>`:"—"}</td><td style="font-size:12px;color:var(--slate)">${f.rule}</td></tr>`).join(""):`<tr><td colspan="7" class="na">No flags in this category for ${PL()}.</td></tr>`)+"</tbody>";
+  const top=F.filter(f=>f.lvl==="alert");
+  $("#exWF [data-t]").textContent = top.length ? `${top.length} alert${top.length>1?"s":""} for ${PL()}: ${top.map(f=>f.meas.toLowerCase()).join(", ")}.` : `No alerts for ${PL()}; ${n("watch")} item${n("watch")===1?"":"s"} to monitor.`;
+  // staff variance
+  const m=cur(), rows=[];
+  m.staffDetail.forEach(s=>{const ta=teamAvgFor(m,s.team);
+    if(!s.interactions) rows.push([s,"No recorded interactions","—","—","watch"]);
+    else { if(ta.inter&&s.interactions<0.6*ta.inter) rows.push([s,"Volume below 60% of team average",fmt(s.interactions),fmt(ta.inter),"watch"]);
+      if(s.aht!=null&&ta.aht&&s.aht>=1.25*ta.aht) rows.push([s,"Handle time 25%+ above team average",fmt(s.aht,1)+" min",fmt(ta.aht,1)+" min","watch"]); }});
+  $("#exWS [data-c]").innerHTML=`<thead><tr><th>Status</th><th>Staff</th><th>Team</th><th>Flag</th><th class="r">Staff value</th><th class="r">Team average</th><th></th></tr></thead><tbody>`+
+    (rows.length?rows.map(([s,fl,a,b,l])=>`<tr><td>${tag(l)}</td><td>${esc(s.name)}</td><td><span style="display:inline-block;width:8px;height:8px;background:${TCOL[s.team]};margin-right:6px"></span>${s.team.replace("&","&amp;")}</td><td>${fl}</td><td class="r">${a}</td><td class="r">${b}</td><td><button class="pill" data-staff="${esc(s.name)}" type="button">View profile</button></td></tr>`).join(""):`<tr><td colspan="7" class="na">No staff outside team norms for ${PL()}.</td></tr>`)+"</tbody>";
+  $("#exWS [data-c]").onclick=e=>{const b=e.target.closest("[data-staff]");if(!b)return;S.staff=b.dataset.staff;$("#tabChips [data-tab='profile']").click()};
+  $("#exWS [data-t]").textContent = rows.length ? `${new Set(rows.map(r=>r[0].name)).size} staff member${rows.length>1?"s":""} fall outside team norms in ${PL()}; most variance is in ${(t=>t.length>1?t.slice(0,-1).join(", ")+" and "+t.at(-1):t[0])([...new Set(rows.map(r=>r[0].team))])}.` : `All staff are within team norms in ${PL()}.`;
+}
+
+/* ---- data completeness ---- */
+const nonNull=a=>a.filter(v=>v!=null&&!(typeof v==="number"&&isNaN(v))).length/a.length;
+const DQ=[
+  {l:"Calls serviced and reconciliation",f:m=>nonNull([m.callsServiced,m.funnel.totalAll,m.funnel.subtract,m.funnel.transfers])},
+  {l:"Callback pipeline",f:m=>nonNull(Object.values(m.funnel))},
+  {l:"Team metrics (staff, utilization, calls)",f:m=>nonNull([...m.staff,...m.util,...m.callsPerHour,...m.teamCalls8h])},
+  {l:"Handle and wait times",f:m=>nonNull([...Object.values(m.aht),m.avgWait[0],m.longWait[0]])},
+  {l:"Triage and DON-R counts",f:m=>nonNull([...m.triage,...m.hcbsDonr])},
+  {l:"Staff interactions table",f:m=>{const z=m.staffDetail.filter(s=>!s.interactions).length;return z?0.5:1}},
+  {l:"Disposition report",f:m=>{const t=Object.values(m.disp).reduce((a,b)=>a+b,0);if(!t)return 0;return (m.disp["Not dispositioned"]||0)/t>0.1?0.5:1}},
+  {l:"Agent status time",f:m=>{const s=Object.values(m.status).reduce((a,b)=>a+b,0);return !s?0:s<0.98?0.5:1}},
+  {l:"Intake and referrals",f:m=>nonNull([m.web,m.email,m.walkin,m.aps,m.mac,m.uniteus])},
+  {l:"ePRO resource records",f:m=>nonNull(m.rs.map(r=>r.updated))},
+  {l:"P28 calls",f:m=>nonNull(m.rs.filter(r=>r.name!=="Danielle").map(r=>r.p28))},
+  {l:"Transitions and options counseling",f:m=>nonNull(Object.values(m.options||{referrals:null}))},
+  {l:"Team handle time (new)",f:m=>nonNull(m.teamAht||[null])},
+  {l:"BRI caseload and enrollments (new)",f:m=>m.bri?nonNull([m.bri.new,m.bri.dc,m.bri.served,...m.staffDetail.filter(s=>s.team==="BRI").map(s=>s.enroll)]):0},
+  {l:"UniteUs by Special Projects (new)",f:m=>nonNull(m.staffDetail.filter(s=>s.team==="Special Projects").map(s=>s.uniteus))},
+  {l:"ePRO updating compliance (new)",f:m=>m.epro?1:0},
+  {l:"Trends narrative (new)",f:m=>(m.narrative||[]).length?1:0},
+];
+function renderDQ(){
+  const el=$("#exDQ [data-c]"), sc=(f)=>f>=1?1:f>0?0.5:0;
+  const colScore=i=>D[i].has?mean(DQ.map(r=>sc(r.f(D[i])))):0;
+  el.innerHTML=`<thead><tr><th>Data block</th>${SHORT.map((s,i)=>`<th class="r ${SEL(i)?"sel":""} ${D[i].has?"":"pend"}">${s}</th>`).join("")}</tr></thead><tbody>`+
+    DQ.map(r=>`<tr><td>${r.l}</td>${SHORT.map((s,i)=>`<td class="r ${SEL(i)?"sel":""}">${harvey(D[i].has?sc(r.f(D[i])):0)}</td>`).join("")}</tr>`).join("")+
+    `<tr class="grp"><td>Completeness</td>${SHORT.map((s,i)=>`<td class="r">${D[i].has?pct(colScore(i)):"0%"}</td>`).join("")}</tr></tbody>`;
+  const gaps=[];avail.forEach(i=>DQ.forEach(r=>{if(r.f(D[i])<1)gaps.push(`${r.l.toLowerCase()} (${SHORT[i]})`)}));
+  $("#exDQ [data-t]").textContent=`${avail.length} of 12 months entered. Gaps in reported months: ${gaps.join("; ")}.`;
+}
+
+
+/* ================= UPDATED-WORKBOOK EXHIBITS ================= */
+function groupBars(el,series,o={}){ // series: [{label,color,vals}] grouped per month
+  const w=W(el), h=o.h||240, top=24, bot=28, bw=w/12, n=series.length, b=Math.min(o.bar||16,(bw*0.7)/n);
+  const all=series.flatMap(s=>s.vals.filter(v=>v!=null)); const mx=(o.max||Math.max(...all,1))*1.15;
+  let g=""; [0.25,0.5,0.75,1].forEach(f=>{const yy=h-bot-(h-top-bot)*f;g+=ln(0,yy,w,yy,"var(--grid)")});
+  g+=ln(0,h-bot,w,h-bot,"var(--slate)");
+  D.forEach((m,i)=>{const cx=bw*i+bw/2, x0=cx-n*b/2;
+    if(m.has&&series.some(s=>s.vals[i]!=null)){ series.forEach((s,k)=>{const v=s.vals[i]; if(v==null) return; const bh=(h-top-bot)*v/mx;
+      g+=r(x0+k*b,h-bot-bh,b-1,bh,s.color,`${m.month} · ${s.label}: ${(o.f||fmt)(v)}`,SEL(i)?"":`opacity="0.55"`); g+=t(x0+k*b+b/2,h-bot-bh-5,(o.f||fmt)(v),{a:"middle",size:10,mono:1,c:"var(--ink)"});});
+      if(o.note) g+=t(cx,top-8,o.note(i),{a:"middle",size:10,mono:1,c:"var(--muted)",w:600}); }
+    else g+=`<rect x="${cx-8}" y="${h-bot-14}" width="16" height="14" style="fill:none;stroke:var(--warm);stroke-dasharray:3 3"/>`;
+    g+=t(cx,h-bot+18,SHORT[i],{a:"middle",size:11,mono:1,c:SEL(i)?"var(--ink)":"var(--muted)",w:SEL(i)?600:400});});
+  el.innerHTML=svg(w,h,g);
+}
+function stackBars(el,series,o={}){
+  const w=W(el), h=o.h||250, top=24, bot=28, bw=w/12, b=Math.min(34,bw*0.6);
+  const tot=D.map((m,i)=>m.has?series.reduce((a,s)=>a+(s.vals[i]||0),0):null), mx=Math.max(...tot.filter(v=>v!=null))*1.12;
+  let g=""; [0.25,0.5,0.75,1].forEach(f=>{const yy=h-bot-(h-top-bot)*f;g+=ln(0,yy,w,yy,"var(--grid)")});
+  g+=ln(0,h-bot,w,h-bot,"var(--slate)");
+  D.forEach((m,i)=>{const cx=bw*i+bw/2;
+    if(m.has){let y=h-bot; series.forEach(s=>{const v=s.vals[i]||0; if(!v) return; const bh=(h-top-bot)*v/mx; y-=bh;
+      g+=r(cx-b/2,y,b,bh,s.color,`${m.month} · ${s.label}: ${fmt(v)}`,SEL(i)?"":`opacity="0.55"`);});
+      g+=t(cx,y-6,fmt(tot[i]),{a:"middle",size:10.5,mono:1,w:500,c:"var(--ink)"});}
+    else g+=`<rect x="${cx-b/2}" y="${h-bot-20}" width="${b}" height="20" style="fill:none;stroke:var(--warm);stroke-dasharray:3 3"/>`;
+    g+=t(cx,h-bot+18,SHORT[i],{a:"middle",size:11,mono:1,c:SEL(i)?"var(--ink)":"var(--muted)",w:SEL(i)?600:400});});
+  el.innerHTML=svg(w,h,g);
+}
+
+function exTA(){
+  const S1=TEAMS.map((tm,k)=>({label:tm,color:TCOL[tm],vals:MV(m=>m.teamAht?.[k]??null)}));
+  legend($("#exTA [data-l]"),S1); lineChart($("#exTA [data-c]"),S1,{yMin:10,yMax:30,f:v=>fmt(v,1),tf:v=>fmt(v)});
+  const m=cur(), a=m.teamAht, lo=a.indexOf(Math.min(...a)), hi=a.indexOf(Math.max(...a));
+  $("#exTA [data-t]").textContent=`${TEAMS[lo]} had the shortest team handle time in ${PL()} at ${fmt(a[lo],1)} minutes; ${TEAMS[hi]} had the longest at ${fmt(a[hi],1)} minutes.`;
+}
+function exCH(){
+  const S1=TEAMS.map((tm,k)=>({label:tm,color:TCOL[tm],vals:MV(m=>m.callsPerHour[k])}));
+  legend($("#exCH [data-l]"),S1); lineChart($("#exCH [data-c]"),S1,{yMin:0,yMax:2,ticks:4,f:v=>fmt(v,2),tf:v=>fmt(v,1)});
+  const m=cur(), c=m.callsPerHour, hi=c.indexOf(Math.max(...c));
+  $("#exCH [data-t]").textContent=`${TEAMS[hi]} handled the most calls per hour in ${PL()} (${fmt(c[hi],2)}); the team average was ${fmt(mean(c),2)}.`;
+}
+function exUU(){
+  const sp=nm=>MV(m=>{const r=m.staffDetail.find(s=>s.name===nm);return r?r.uniteus:null});
+  const d=sp("Derek"), sh=sp("Shalynda"), rest=MV(m=>m.uniteus).map((v,i)=>v==null?null:Math.max(0,v-(d[i]||0)-(sh[i]||0)));
+  stackBars($("#exUU [data-c]"),[{label:"Derek",color:"var(--serieNavy)",vals:d},{label:"Shalynda",color:"var(--accent2)",vals:sh},{label:"Not attributed",color:"var(--warm)",vals:rest}]);
+  const m=cur(), spT=m.staffDetail.filter(s=>s.team==="Special Projects").reduce((a,s)=>a+(s.uniteus||0),0);
+  $("#exUU [data-t]").textContent = spT ? `Special Projects staff processed ${fmt(spT)} of ${fmt(m.uniteus)} UniteUs referrals (${pct(Math.min(1,spT/m.uniteus))}) in ${PL()}, alongside ${fmt(m.staffDetail.filter(s=>s.team==="Special Projects").reduce((a,s)=>a+(s.interactions||0),0))} call interactions.` : `UniteUs referrals were not attributed to staff in ${PL()}; staff-level tracking began in August.`;
+}
+function exEC(){
+  const S1=[{label:"Updating compliance",color:"var(--teal)",vals:MV(m=>m.epro?m.epro.current/m.epro.total:null)}];
+  lineChart($("#exEC [data-c]"),S1,{yMin:0.8,yMax:1,ticks:4,target:0.9,targetLabel:"90%",f:v=>pct(v,1),tf:v=>pct(v)});
+  const m=cur(), e=m.epro, f=D[avail[0]].epro;
+  $("#exEC [data-o]").innerHTML=e?`<div><b>${pct(e.current/e.total,1)}</b>Records current</div><div><b>${fmt(e.current)}</b>Current records</div><div><b>${fmt(e.total)}</b>Total records</div><div><b>${fmt(e.total-e.current)}</b>Records outstanding</div>`:"";
+  $("#exEC [data-t]").textContent = e ? `${pct(e.current/e.total,1)} of ePRO resource records were current at the end of ${PL()}${END()>avail[0]?`, up from ${pct(f.current/f.total,1)} in July even as the database grew by ${fmt(e.total-f.total)} records`:""}.` : `No compliance figure entered for ${PL()}.`;
+}
+
+/* ---- BRI ---- */
+function renderBRI(){
+  const m=cur(), p=prev(), b=m.bri||{}, pb=p&&p.bri, staff=m.staffDetail.filter(s=>s.team==="BRI"), enr=staff.reduce((a,s)=>a+(s.enroll||0),0), penr=p?p.staffDetail.filter(s=>s.team==="BRI").reduce((a,s)=>a+(s.enroll||0),0):null;
+  const net=b.new-b.dc;
+  const k=[["Clients served",fmt(b.served),"",pb?`${delta(b.served,pb.served)} vs ${PPS()}`:(isM()?"Monthly count":"End of period")],
+    ["New cases",fmt(b.new),"",pb?`${delta(b.new,pb.new)} vs ${PPS()}`:PL()],
+    ["Discharged cases",fmt(b.dc),b.dc>b.new?"bad":"",pb?`${delta(b.dc,pb.dc,false)} vs ${PPS()}`:PL()],
+    ["Net caseload change",(net>0?"+":"")+fmt(net),net<0?"bad":"",net<0?"More discharges than new cases":"New cases at or above discharges"],
+    ["Enrollments",fmt(enr),"",penr!=null?`${delta(enr,penr)} vs ${PPS()}`:`${staff.length} BRI staff`]];
+  $("#briK").innerHTML=k.map(([l,v,c,n])=>`<div class="kpi"><div class="label">${l}</div><div class="val ${c}">${v}</div><div class="note">${n}</div></div>`).join("");
+  groupBars($("#exBF [data-c]"),[{label:"New cases",color:"var(--teal)",vals:MV(o=>o.bri?.new??null)},{label:"Discharged",color:"var(--red)",vals:MV(o=>o.bri?.dc??null)}],{bar:20,note:i=>{const o=D[i].bri;if(!o)return"";const d=o.new-o.dc;return `net ${d>0?"+":""}${d}`}});
+  const ids=UPTO(), tn=ids.reduce((a,i)=>a+(D[i].bri?.new||0),0), td=ids.reduce((a,i)=>a+(D[i].bri?.dc||0),0);
+  $("#exBF [data-t]").textContent=`BRI opened ${fmt(b.new)} and discharged ${fmt(b.dc)} cases in ${PL()} (net ${net>0?"+":""}${fmt(net)}); fiscal year to date, new cases total ${fmt(tn)} against ${fmt(td)} discharges.`;
+  lineChart($("#exBS [data-c]"),[{label:"Clients served",color:"var(--serieNavy)",vals:MV(o=>o.bri?.served??null)}],{yMin:100,yMax:150,ticks:5});
+  const f=D[avail[0]].bri;
+  $("#exBS [data-t]").textContent=`BRI served ${fmt(b.served)} clients in ${isM()?PL():"the last month of "+PL()}${END()>avail[0]?`, up from ${fmt(f.served)} in July`:""}, about ${fmt(b.served/staff.length)} per BRI staff member.`;
+  const S2=["Alyssa","Melanie","Sundra"].map((nm,k)=>({label:nm,color:["var(--serieNavy)","var(--accent)","var(--teal)"][k],vals:MV(o=>o.staffDetail.find(s=>s.name===nm)?.enroll??null)}));
+  legend($("#exBE [data-l]"),S2); groupBars($("#exBE [data-c]"),S2,{bar:12});
+  const top=[...staff].sort((a,c)=>(c.enroll||0)-(a.enroll||0))[0];
+  $("#exBE [data-t]").textContent=`BRI staff completed ${fmt(enr)} enrollments in ${PL()}; ${top.name} completed the most (${fmt(top.enroll)}).`;
+  $("#exBT [data-c]").innerHTML=`<thead><tr><th>Staff</th><th class="r">Interactions</th><th class="r">Per day</th><th class="r">Handle time, min</th><th class="r">Enrollments</th><th class="r">Per 100 interactions</th></tr></thead><tbody>`+
+    staff.map(s=>`<tr><td>${esc(s.name)}</td><td class="r">${fmt(s.interactions)}</td><td class="r">${fmt(s.perDay,isM()?0:1)}</td><td class="r">${fmt(s.aht,1)}</td><td class="r">${fmt(s.enroll)}</td><td class="r">${s.interactions?fmt(s.enroll/s.interactions*100,1):"—"}</td></tr>`).join("")+
+    `<tr class="grp"><td>BRI total</td><td class="r">${fmt(staff.reduce((a,s)=>a+s.interactions,0))}</td><td></td><td class="r">${fmt(staff.reduce((a,s)=>a+s.aht*s.interactions,0)/staff.reduce((a,s)=>a+s.interactions,0),1)}</td><td class="r">${fmt(enr)}</td><td class="r">${fmt(enr/staff.reduce((a,s)=>a+s.interactions,0)*100,1)}</td></tr></tbody>`;
+  const cc=teamAvgFor(m,"I&R").aht, ba=staff.reduce((a,s)=>a+s.aht*s.interactions,0)/staff.reduce((a,s)=>a+s.interactions,0);
+  $("#exBT [data-t]").textContent=`BRI staff averaged ${fmt(ba,1)} minutes per interaction in ${PL()}, ${fmt(Math.abs(ba-cc),1)} minutes ${ba>=cc?"longer":"shorter"} than the I&R team average.`;
+}
+
+/* ---- Capacity & narrative ---- */
+function renderCapacity(){
+  const ids=PIDS();
+  $("#exNR [data-c]").innerHTML=ids.map(i=>`<h4>${D[i].month}</h4>${(D[i].narrative||[]).length?D[i].narrative.map(p=>`<p>${esc(p)}</p>`).join(""):`<p class="na">No narrative entered for ${D[i].month}.</p>`}`).join("");
+  const ncw=m=>m.web+m.email+m.aps+m.uniteus+m.mac+m.walkin, fte=m=>m.staff.reduce((a,b)=>a+b,0);
+  const R=[
+    ["Team utilization (target 80%)",m=>mean(m.util),v=>pct(v,1),m=>mean(m.util)>=0.8?"met":"alert",m=>mean(m.util)>=0.8?"Above target":"Below target"],
+    ["Calls handled per staff per day",m=>mean(m.callsPerDay),v=>fmt(v,1),null],
+    ["MDE quality",m=>mean(m.mde),v=>pct(v,1),m=>mean(m.mde)>=0.98?"met":"watch",m=>mean(m.mde)>=0.98?"98% or higher":"Below 98%"],
+    ["Post-call satisfaction",m=>m.survey,v=>pct(v,1),m=>m.survey>=0.95?"met":"alert",m=>m.survey>=0.95?"95% or higher":"Below 95%"],
+    ["Average callback wait, calendar days",m=>m.avgWait[0],v=>fmt(v,1),m=>m.avgWait[0]>m.sopCal[0]?"alert":m.avgWait[0]>m.sopCal[0]*0.75?"watch":"met",m=>`SOP ${fmt(m.sopCal[0])} calendar days`],
+    ["Longest callback wait, calendar days",m=>m.longWait[0],v=>fmt(v,1),m=>m.longWait[0]>m.sopCal[0]?"alert":m.longWait[0]>m.sopCal[0]-1?"watch":"met",m=>`SOP ${fmt(m.sopCal[0])} calendar days`],
+    ["SOP, business days",m=>m.sopBus[0],v=>fmt(v),null],
+    ["Callbacks still in list",m=>m.funnel.stillInList,v=>fmt(v),m=>m.funnel.stillInList>500?"alert":"watch",m=>"Unserviced at month end"],
+    ["Non-call work items",ncw,v=>fmt(v),null],
+    ["Non-call work items per team FTE",m=>ncw(m)/fte(m),v=>fmt(v,0),null],
+    ["Calls serviced per team FTE",m=>m.callsServiced/fte(m),v=>fmt(v,0),null],
+  ];
+  const cols=avail;
+  $("#exCE [data-c]").innerHTML=`<thead><tr><th>Indicator</th>${cols.map(i=>`<th class="r ${SEL(i)?"sel":""}">${SHORT[i]}</th>`).join("")}<th>Status, ${SHORT[END()]}</th><th>Basis</th></tr></thead><tbody>`+
+    R.map(([l,f,fm,st,basis])=>`<tr><td>${l}</td>${cols.map(i=>`<td class="r ${SEL(i)?"sel":""}">${fm(f(D[i]))}</td>`).join("")}<td>${st?tag(st(D[END()])):"—"}</td><td style="font-size:12px;color:var(--slate)">${basis?basis(D[END()]):"Context"}</td></tr>`).join("")+"</tbody>";
+  const e=D[END()];
+  $("#exCE [data-t]").textContent=`In ${LONG[END()]}, utilization (${pct(mean(e.util),1)}), quality (${pct(mean(e.mde),1)} MDE) and satisfaction (${pct(e.survey,1)}) all met their standards while ${fmt(e.funnel.stillInList)} callbacks stayed in the list, the pattern the narrative attributes to capacity rather than performance.`;
+  const S1=[{label:"Calls serviced",color:"var(--serieNavy)",vals:MV(m=>m.callsServiced)},{label:"Web intakes",color:"var(--accent)",vals:MV(m=>m.web)},{label:"Referrals (APS, UniteUs, MAC)",color:"var(--teal)",vals:MV(m=>m.aps+m.uniteus+m.mac)},{label:"Info emails and walk-ins",color:"var(--soft)",vals:MV(m=>m.email+m.walkin)}];
+  legend($("#exWC [data-l]"),S1); stackBars($("#exWC [data-c]"),S1);
+  const c=cur();
+  $("#exWC [data-t]").textContent=`Non-call work added ${fmt(ncw(c))} items to ${fmt(c.callsServiced)} calls serviced in ${PL()}, so phones account for ${pct(c.callsServiced/(c.callsServiced+ncw(c)))} of counted workload.`;
+  groupBars($("#exBL [data-c]"),[{label:"Callbacks serviced",color:"var(--serieNavy)",vals:MV(m=>m.funnel.serviced)},{label:"Still in callback list",color:"var(--red)",vals:MV(m=>m.funnel.stillInList)}],{bar:20});
+  $("#exBL [data-t]").textContent=`Callbacks serviced rose to ${fmt(e.funnel.serviced)} in ${LONG[END()]}, yet the month-end list ${dirWord(e.funnel.stillInList,D[avail[0]].funnel.stillInList,"grew","shrank")} to ${fmt(e.funnel.stillInList)} from ${fmt(D[avail[0]].funnel.stillInList)} in July.`;
+  renderCalc(false);
+}
+const CALC={};
+function renderCalc(reset){
+  const e=D[END()];
+  if(reset||CALC.end!==END()){Object.assign(CALC,{end:END(),backlog:e.funnel.stillInList,rate:+fmt(mean(e.callsPerDay),1),days:21,fte:+e.staff.reduce((a,b)=>a+b,0).toFixed(1)});}
+  const F=[["backlog","Callback backlog","Still in list, end of "+LONG[END()]],["rate","Calls per FTE per day","Avg calls handled per staff per day"],["days","Working days to clear","21 ≈ one month; 63 ≈ one quarter"],["fte","Current team FTE","I&R + EDWP + HCBS"]];
+  if(reset||!$("#calcIn input")){ $("#calcIn").innerHTML=F.map(([k,l,h])=>`<label>${l}<input type="number" min="0" step="any" data-k="${k}" value="${CALC[k]}"><small>${h}</small></label>`).join("");
+    $("#calcIn").oninput=ev=>{const k=ev.target.dataset.k; if(!k) return; CALC[k]=Math.max(0,+ev.target.value||0); calcOut();}; }
+  calcOut();
+}
+function calcOut(){
+  const {backlog,rate,days,fte}=CALC, need=rate&&days?backlog/(rate*days):0;
+  $("#exCG [data-o]").innerHTML=`<div><b>${fmt(need,1)}</b>Additional FTE needed</div><div><b>${fmt(backlog/Math.max(rate,0.01))}</b>Staff-days of work in backlog</div><div><b>${fte?pct(need/fte,1):"—"}</b>Increase over current team FTE</div><div><b>${rate&&fte?fmt(backlog/(rate*fte),1):"—"}</b>Working days if all current staff did only backlog</div>`;
+  const el=$("#exCG [data-c]"), opts=[10,21,42,63,84], items=opts.map(d=>({label:`${d} working days`,value:rate?backlog/(rate*d):0,vlabel:fmt(rate?backlog/(rate*d):0,1)+" FTE",color:d===days?"var(--accent)":"var(--serieNavy)",tip:`Clear ${fmt(backlog)} callbacks in ${d} working days at ${fmt(rate,1)} calls per FTE per day`}));
+  hbars(el,items,{rowH:28,labelW:130,valW:70});
+  $("#exCG [data-t]").textContent=`Clearing ${fmt(backlog)} backlogged callbacks in ${fmt(days)} working days at ${fmt(rate,1)} calls per FTE per day would take about ${fmt(need,1)} additional FTE (${fte?pct(need/fte,0):"—"} of current team capacity), before any growth in new demand.`;
+}
+
+/* ---------- tooltip ---------- */
+const tip=$("#tip");
+document.addEventListener("mousemove",e=>{const el=e.target.closest("[data-tip]");if(!el){tip.style.opacity=0;return}
+  tip.textContent=el.getAttribute("data-tip");tip.style.opacity=1;
+  const x=Math.min(e.clientX+14,innerWidth-tip.offsetWidth-8),y=Math.min(e.clientY+14,innerHeight-tip.offsetHeight-8);tip.style.left=x+"px";tip.style.top=y+"px"});
+
+function renderCharts(){
+  if(S.tab==="summary"){ex1();exMT()}
+  if(S.tab==="calls"){ex2();ex3();exCT();exHT();ex5();ex6();ex7();ex8();exDT()}
+  if(S.tab==="teams"){ex4();exUT();exHA();exTA();exCH();ex10();exSC();exST()}
+  if(S.tab==="intake"){ex9();exRF();exRS();exUU();exEC();ex11()}
+  if(S.tab==="bri"){renderBRI()}
+  if(S.tab==="capacity"){renderCapacity()}
+  if(S.tab==="profile"){buildStaffSel();renderProfile()}
+  if(S.tab==="watch"){renderWatch()}
+  if(S.tab==="notes"){renderDQ()}
+}
+function render(){ buildMonths(); renderKPIs(); renderSummary(); renderCharts(); }
+pills("teamSeg",[["All","All teams"],["I&R","I&R"],["EDWP","EDWP"],["HCBS","HCBS"]],"team",ex4,"Highlight");
+pills("wSeg",[["all","All flags"],["alert","Alerts"],["watch","Watch"],["good","Improving"],["info","Notes"]],"wf",renderWatch);
+pills("dispSeg",[["count","Count"],["share","Share"]],"disp",ex7);
+pills("staffTeam",[["All","All"],["I&R","I&R"],["EDWP","EDWP"],["HCBS","HCBS"],["Special Projects","Special projects"],["BRI","BRI"]],"sTeam",()=>{ex10();exSC();exST()},"Team");
+pills("staffMetric",[["interactions","Monthly"],["perDay","Per day"],["aht","Handle time"],["triage","Triages"]],"sMetric",ex10,"Measure");
+render();
+let rt;new ResizeObserver(()=>{clearTimeout(rt);rt=setTimeout(renderCharts,120)}).observe(document.body);
+</script>
+</body>
+</html>
