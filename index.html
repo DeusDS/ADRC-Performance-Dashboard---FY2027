@@ -819,7 +819,7 @@ function renderKPIs(){
   switch(S.tab){
   case "calls": {
     k=[["Calls serviced",fmt(m.callsServiced),"",p?vs(m.callsServiced,p.callsServiced):`Of ${fmt(m.funnel.totalAll)} serviced interactions`],
-       ["Callbacks selected",fmt(m.funnel.selected),"",p?vsN(m.funnel.selected,p.funnel.selected):`${pct(m.funnel.scheduled/m.funnel.selected)} went on to schedule`],
+       ["Callbacks serviced",fmt(m.funnel.serviced),"",p?vs(m.funnel.serviced,p.funnel.serviced):`Of ${fmt(m.funnel.scheduled)} scheduled`],
        ["Service rate",pct(sr(m),1),sr(m)<0.4?"bad":"",p?vs(sr(m),sr(p),true,"pp"):"Serviced ÷ caller-scheduled"],
        ["Avg callback wait",fmt(m.avgWait[0],1)+" days",m.avgWait[0]>m.sopCal[0]?"bad":"",`SOP ${fmt(m.sopCal[0])} days ${meter(m.avgWait[0],m.sopCal[0],Math.max(m.sopCal[0],m.longWait[0])*1.1)}`],
        ["Callback handle time",fmt(m.aht.callback,1)+" min",p&&m.aht.callback>p.aht.callback*1.1?"bad":"",p?vs(m.aht.callback,p.aht.callback,false,"abs"," min"):`Talk ${fmt(m.aht.cbTalk,1)} · wrap ${fmt(m.aht.cbWrap,1)} min`]]; break;}
