@@ -58,6 +58,13 @@ header p.sub{margin-top:14px;color:#b9c4d4;font-size:15px;max-width:680px}
 .kcap b{color:var(--accent);font-weight:500}
 .kcap + .kpis{margin-top:8px}
 .kpi{background:var(--card);padding:22px 22px 20px}
+/* align labels, values and notes across every card in a row, even when a label wraps */
+@supports (grid-template-rows:subgrid){
+  .kpis:not(.free){grid-auto-rows:auto}
+  .kpis:not(.free) .kpi{display:grid;grid-row:span 3;grid-template-rows:subgrid;row-gap:0}
+  .kpis:not(.free) .kpi .label{align-self:end}
+  .kpis:not(.free) .kpi .val,.kpis:not(.free) .kpi .note{align-self:start}
+}
 .kpi .label{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:600}
 .kpi .val{font-family:var(--serif);font-size:28px;font-weight:500;margin-top:8px;color:var(--serieNavy);letter-spacing:-.5px}
 .kpi .val.bad{color:var(--red)}
@@ -611,7 +618,7 @@ footer{margin:40px 0 24px;padding-top:18px;border-top:1px solid var(--line);font
         <p class="src">Categories may overlap. Source: ADRC Dashboard FY2027 workbook.</p>
       </div>
       <div class="card" id="exBL">
-        <h3>Callbacks Serviced vs. Backlog</h3>
+        <h3>Callbacks Serviced vs. Pending</h3>
         <div class="csub">Callbacks serviced each month against callbacks still in the list at month end.</div>
         <div class="legend"><span><i style="background:var(--serieNavy)"></i>Callbacks serviced</span><span><i style="background:var(--red)"></i>Still in callback list</span></div>
         <div class="chart" data-c></div>
@@ -812,6 +819,7 @@ const vsN=(a,b,mode="pct",u="")=>vs(a,b,true,mode,u).replace(/class="(good|bad) 
 function renderKPIs(){
   const m=cur(),p=prev(),u=mean(m.util),fte=x=>x.staff.reduce((a,b)=>a+b,0),base=isM()?"FY2027 baseline":"No prior period";
   $("#kcap").innerHTML=`<span>Key figures · <b>${esc(TABNAME[S.tab])}</b></span><span>${esc(PL())}</span>`;
+  $("#kpis").classList.toggle("free",S.tab==="capacity"); // Capacity view keeps its original top-aligned card layout
   if(S.tab==="profile"||S.tab==="bri") return; // these views render their own cards into the strip
   const sr=x=>x.funnel.serviced/x.funnel.scheduled, ncw=x=>x.web+x.email+x.aps+x.uniteus+x.mac+x.walkin, ref=x=>x.aps+x.uniteus+x.mac;
   const tri=x=>x.triage.reduce((a,b)=>a+(b||0),0), p28=x=>x.rs.reduce((a,r)=>a+(r.p28||0),0);
@@ -862,8 +870,8 @@ function renderKPIs(){
        ["Not entered",fmt(none),none?"bad":"","Blocks with no data"]]; break;}
   default:
     k=[["Calls serviced",fmt(m.callsServiced),"",p?vs(m.callsServiced,p.callsServiced):base],
-       ["Callbacks serviced",fmt(m.funnel.serviced),"",`${pct(sr(m))} of caller-scheduled`],
-       ["Callbacks still in list",fmt(m.funnel.stillInList),p&&m.funnel.stillInList>p.funnel.stillInList?"bad":"",p?vs(m.funnel.stillInList,p.funnel.stillInList,false):"Awaiting service at month end"],
+       ["Callbacks serviced",fmt(m.funnel.serviced),"",`${pct(sr(m))} of ${fmt(m.funnel.scheduled)} scheduled`],
+       ["Callbacks pending",fmt(m.funnel.stillInList),p&&m.funnel.stillInList>p.funnel.stillInList?"bad":"",p?vs(m.funnel.stillInList,p.funnel.stillInList,false):"Awaiting service at month end"],
        ["Avg callback wait",fmt(m.avgWait[0],1)+" days","",`Longest ${fmt(m.longWait[0],1)} days`],
        ["Team utilization",pct(u,1),u<0.8?"bad":"",`Target 80% ${meter(u,0.8)}`]];
   }
@@ -1583,7 +1591,7 @@ const CALC={};
 function renderCalc(reset){
   const e=D[END()];
   if(reset||CALC.end!==END()){Object.assign(CALC,{end:END(),backlog:e.funnel.stillInList,rate:+fmt(mean(e.callsPerDay),1),days:21,fte:+e.staff.reduce((a,b)=>a+b,0).toFixed(1)});}
-  const F=[["backlog","Callback backlog","Still in list, end of "+LONG[END()]],["rate","Calls per FTE per day","Avg calls handled per staff per day"],["days","Working days to clear","21 ≈ one month; 63 ≈ one quarter"],["fte","Current team FTE","I&R + EDWP + HCBS"]];
+  const F=[["backlog","Callbacks pending","Still in list, end of "+LONG[END()]],["rate","Calls per FTE per day","Avg calls handled per staff per day"],["days","Working days to clear","21 ≈ one month; 63 ≈ one quarter"],["fte","Current team FTE","I&R + EDWP + HCBS"]];
   if(reset||!$("#calcIn input")){ $("#calcIn").innerHTML=F.map(([k,l,h])=>`<label>${l}<input type="number" min="0" step="any" data-k="${k}" value="${CALC[k]}"><small>${h}</small></label>`).join("");
     $("#calcIn").oninput=ev=>{const k=ev.target.dataset.k; if(!k) return; CALC[k]=Math.max(0,+ev.target.value||0); calcOut();}; }
   calcOut();
