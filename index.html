@@ -828,7 +828,7 @@ function renderKPIs(){
   case "calls": {
     k=[["Calls serviced",fmt(m.callsServiced),"",p?vs(m.callsServiced,p.callsServiced):`Of ${fmt(m.funnel.totalAll)} serviced interactions`],
        ["Callbacks serviced",fmt(m.funnel.serviced),"",p?vs(m.funnel.serviced,p.funnel.serviced):`Of ${fmt(m.funnel.scheduled)} scheduled`],
-       ["Service rate",pct(sr(m),1),sr(m)<0.4?"bad":"",p?vs(sr(m),sr(p),true,"pp"):"Serviced ÷ caller-scheduled"],
+       ["Service rate",pct(sr(m),1),sr(m)<0.4?"bad":"",p?vs(sr(m),sr(p),true,"pp"):"Share of scheduled callbacks completed"],
        ["Avg callback wait",fmt(m.avgWait[0],1)+" days",m.avgWait[0]>m.sopCal[0]?"bad":"",`SOP ${fmt(m.sopCal[0])} days ${meter(m.avgWait[0],m.sopCal[0],Math.max(m.sopCal[0],m.longWait[0])*1.1)}`],
        ["Callback handle time",fmt(m.aht.callback,1)+" min",p&&m.aht.callback>p.aht.callback*1.1?"bad":"",p?vs(m.aht.callback,p.aht.callback,false,"abs"," min"):`Talk ${fmt(m.aht.cbTalk,1)} · wrap ${fmt(m.aht.cbWrap,1)} min`]]; break;}
   case "teams": {
@@ -888,7 +888,7 @@ function renderSummary(){
     F.push([c<0?"bad":"good",fmt(m.callsServiced),`Reported calls serviced ${dirWord(c,0)} ${pct(Math.abs(c),1)} from ${pm}`,`${pm} closed at ${fmt(p.callsServiced)}. FY2027 calls serviced to date total ${fmt(ytd)}.`]);
   } else F.push(["",fmt(m.callsServiced),`Calls serviced in ${mo}, the FY2027 baseline`,`Gross serviced interactions, including callbacks, voicemails and outbound calls, were ${fmt(m.funnel.totalAll)}.`]);
   const bl=m.funnel.stillInList, pbl=p?p.funnel.stillInList:null;
-  F.push([p&&bl>pbl?"bad":"good",fmt(bl),p?`Callbacks awaiting service ${dirWord(bl,pbl)} ${pct(Math.abs(chg(bl,pbl)),0)} from ${pm}`:`Callbacks awaiting service at the end of ${mo}`,`Average wait was ${fmt(m.avgWait[0],1)} days and the longest ${fmt(m.longWait[0],1)} days; ${pct(m.funnel.serviced/m.funnel.scheduled)} of caller-scheduled callbacks were serviced.`]);
+  F.push([p&&bl>pbl?"bad":"good",fmt(bl),p?`Callbacks awaiting service ${dirWord(bl,pbl)} ${pct(Math.abs(chg(bl,pbl)),0)} from ${pm}`:`Callbacks awaiting service at the end of ${mo}`,`Average wait was ${fmt(m.avgWait[0],1)} days and the longest ${fmt(m.longWait[0],1)} days; staff completed ${pct(m.funnel.serviced/m.funnel.scheduled)} of scheduled callbacks.`]);
   const u=m.util, met=u.filter(x=>x>=0.8).length, tr=m.triage[2], ptr=p?p.triage[2]:null;
   F.push([met===3?"good":"bad",pct(mean(u),1),`${met===3?"All three teams":met+" of 3 teams"} above the 80% utilization target`,`Range ${pct(Math.min(...u),1)}–${pct(Math.max(...u),1)}; post-call satisfaction ${pct(m.survey,1)}. HCBS completed ${fmt(tr)} triages${p?` (${dirWord(tr,ptr,"up","down")} ${pct(Math.abs(chg(tr,ptr)),0)})`:""} and ${fmt(m.hcbsDonr[2])} DON-Rs.`]);
   const ptw=p?p.web:null, rf=m.aps+m.uniteus+m.mac, prf=p?p.aps+p.uniteus+p.mac:null;
@@ -969,7 +969,7 @@ function ex2(){
     {label:"Serviced",value:f.serviced,color:"var(--accent)",bold:true},
   ].map(i=>({...i,vlabel:`${fmt(i.value)} (${pct(i.value/f.selected)})`,tip:`${i.label}: ${fmt(i.value)} — ${pct(i.value/f.selected,1)} of selected`}));
   hbars(el,items,{rowH:38,valW:110,labelW:Math.min(150,W(el)*0.36)});
-  $("#ex2 [data-t]").textContent=`${pct(f.serviced/f.scheduled)} of caller-scheduled callbacks were serviced in ${PL()}; ${fmt(f.stillInList)} remain in the list.`;
+  $("#ex2 [data-t]").textContent=`Staff completed ${fmt(f.serviced)} of ${fmt(f.scheduled)} scheduled callbacks in ${PL()} (${pct(f.serviced/f.scheduled)}). At ${isM()?"month end":"the end of the period"}, ${fmt(f.stillInList)} callbacks were still pending.`;
   $("#ex2 [data-o]").innerHTML=`<div><b>${fmt(f.notScheduled)}</b>Not scheduled</div><div><b>${fmt(f.notServicedRNA)}</b>Not serviced</div><div><b>${fmt(f.retried)}</b>Retried</div>`;
 }
 
